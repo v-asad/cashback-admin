@@ -1,0 +1,28 @@
+.parent {
+  transform: rotateX(180deg);
+  padding: 0;
+}
+.child {
+  transform: rotateX(180deg);
+}
+/* width */
+.parent ::-webkit-scrollbar {
+  width: 15px;
+}
+
+/* Track */
+.parent ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+.parent ::-webkit-scrollbar-thumb {
+  background: #888;
+  width: 15px;
+}
+
+/* Handle on hover */
+.parent ::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  width: 15px;
+}
