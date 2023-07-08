@@ -1,33 +1,56 @@
-import TextField from '@mui/material/TextField'
-import Grid from '@mui/material/Grid'
-import Button from '@mui/material/Button'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import { DataGrid } from '@mui/x-data-grid'
-import Card from '@mui/material/Card'
-import { useEffect, useRef, useState } from 'react'
-import axios from 'axios'
-import { useAuth } from 'src/hooks/useAuth'
-import CardContent from '@mui/material/CardContent'
-import Icon from 'src/@core/components/icon'
-import Link from '@mui/material/Link'
-import Backdrop from '@mui/material/Backdrop'
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material'
-import CircularProgress from '@mui/material/CircularProgress'
+//----------
+//  React Imports
+//----------
+import { useEffect, useState } from 'react'
+
+//----------
+// MUI Imports
+//----------
+import {
+  Grid,
+  Button,
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Link,
+  Backdrop,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  ImageList,
+  ImageListItem
+} from '@mui/material'
+
+//----------
+// Other library Imports
+//----------
 import { toast } from 'react-hot-toast'
-import { useRouter } from 'next/router'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogContentText from '@mui/material/DialogContentText'
-import DialogTitle from '@mui/material/DialogTitle'
-import TextareaAutosize from '@mui/base/TextareaAutosize'
-import ImageList from '@mui/material/ImageList'
-import ImageListItem from '@mui/material/ImageListItem'
 import { Table, Input } from 'antd'
+import axios from 'axios'
+
+//----------
+// Local Imports
+//----------
+import { useAuth } from 'src/hooks/useAuth'
+
+//----------
+//  Constants
+//----------
+const sorter = ['ascend', 'descend']
+const scroll = 'paper'
 
 const AllVendorList = () => {
-  const auth = useAuth()
+  //----------
+  //  States
+  //----------
   const [data, setData] = useState([])
   const [uploadLogo, setUploadLogo] = useState(null)
   const [open, setOpen] = useState(false)
@@ -36,19 +59,26 @@ const AllVendorList = () => {
   const [editModalOpen, setEditModalOpen] = useState(null)
   const [editBankModalOpen, setEditBankModalOpen] = useState(null)
   const [countries, setCountries] = useState([])
-  const [scroll, setScroll] = useState('paper')
   const [uploadGallery, setUploadGallery] = useState([])
-  const [tableLoading, setTableLoading] = useState(false)
-  const sorter = ['ascend', 'descend'];
   const [pagination, setPagination] = useState({
     pageSize: 10, // Initial page size
     current: 1 // Initial current page
   })
   const [searchedText, setSearchedText] = useState('')
 
-  const router = useRouter()
+  //----------
+  //  Hooks
+  //----------
+  const auth = useAuth()
 
+  //----------
+  //  Refs
+  //----------
   const descriptionElementRef = useRef(null)
+
+  //----------
+  //  Effects
+  //----------
   useEffect(() => {
     if (open) {
       const { current: descriptionElement } = descriptionElementRef
@@ -57,23 +87,76 @@ const AllVendorList = () => {
       }
     }
   }, [open])
+
+  useEffect(() => {
+    const loadData = () => {
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/vendor/list`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.accessToken}`
+          }
+        })
+        .then(response => {
+          const tempData = response.data.map((d, key) => {
+            return { key, ...d }
+          })
+          setData(tempData)
+        })
+        .catch(error => {
+          toast.error(
+            `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
+          )
+          if (error.response && error.response.status == 401) {
+            auth.logout()
+          }
+        })
+    }
+    loadData()
+
+    const loadCountries = () => {
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/countries`)
+        .then(response => {
+          setCountries(response.data)
+        })
+        .catch(error => {
+          toast.error(
+            `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
+          )
+        })
+    }
+    loadCountries()
+  }, [])
+
+  //----------
+  //  Handlers - Close Edit Modal
+  //----------
   const handleClose = () => {
     setEditModalOpen(false)
     setEditBankModalOpen(false)
     setVendor(originalVendor)
   }
-  const loadData = () => {
+
+  //----------
+  //  Handlers - Gallery Upload
+  //----------
+  const galleryUploadHandler = id => {
+    const formData = new FormData()
+    for (let i = 0; i < uploadGallery.length; i++) {
+      formData.append('gallery', uploadGallery[i])
+    }
     axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/vendor/list`, {
+      .put(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/vendor/update/gallery/${id}`, formData, {
         headers: {
+          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${localStorage.accessToken}`
         }
       })
-      .then(response => {
-        const tempData = response.data.map((d, key) => {
-          return { key, ...d }
-        })
-        setData(tempData)
+      .then(resp => {
+        setVendor(null)
+        setUploadGallery([])
+        toast.success(resp.data.message)
+        return true
       })
       .catch(error => {
         toast.error(
@@ -84,6 +167,52 @@ const AllVendorList = () => {
         }
       })
   }
+
+  //----------
+  //  Handlers - Submit Logo Handler
+  //----------
+  const submitLogoHandler = id => {
+    const formData = new FormData()
+    formData.append('cmp_logo', uploadLogo)
+    axios
+      .put(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/vendor/update/logo/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.accessToken}`
+        }
+      })
+      .then(resp => {
+        setVendor(null)
+        setUploadLogo(null)
+        toast.success(resp.data.message)
+        return true
+      })
+      .catch(error => {
+        toast.error(
+          `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
+        )
+        if (error.response && error.response.status == 401) {
+          auth.logout()
+        }
+      })
+  }
+
+  //----------
+  //  Handlers - Gallery Upload
+  //----------
+  const handleGalleryUpload = event => setUploadGallery(event.target.files)
+
+  //----------
+  //  Handlers - Logo Upload
+  //----------
+  const handleLogoUpload = event => {
+    const selectedImage = event.target.files[0]
+    setUploadLogo(selectedImage)
+  }
+
+  //----------
+  //  Actions - Set Access Token
+  //----------
   const setAccessToken = user_id => {
     let url = `${process.env.NEXT_PUBLIC_VENDOR_DASH}dashboard?__sid=${encodeURI(
       localStorage.accessToken
@@ -91,6 +220,9 @@ const AllVendorList = () => {
     window.open(url, '_blank', 'noreferrer')
   }
 
+  //----------
+  //  Actions - Change User Status
+  //----------
   const changeUserStatus = event => {
     let user_id = event.target.getAttribute('data-id')
     let status = parseInt(event.target.getAttribute('data-status'))
@@ -127,77 +259,10 @@ const AllVendorList = () => {
         }
       })
   }
-  useEffect(() => {
-    loadData()
-    loadCountries()
-  }, [])
-  const loadCountries = () => {
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/countries`)
-      .then(response => {
-        setCountries(response.data)
-      })
-      .catch(error => {
-        toast.error(
-          `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
-        )
-      })
-  }
 
-  const galleryUploadHandler = id => {
-    const formData = new FormData()
-    for (let i = 0; i < uploadGallery.length; i++) {
-      formData.append('gallery', uploadGallery[i])
-    }
-    axios
-      .put(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/vendor/update/gallery/${id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${localStorage.accessToken}`
-        }
-      })
-      .then(resp => {
-        setVendor(null)
-        setUploadGallery([])
-        toast.success(resp.data.message)
-        return true
-      })
-      .catch(error => {
-        toast.error(
-          `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
-        )
-        if (error.response && error.response.status == 401) {
-          auth.logout()
-        }
-      })
-  }
-
-  const submitLogoHandler = id => {
-    const formData = new FormData()
-    formData.append('cmp_logo', uploadLogo)
-    axios
-      .put(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/vendor/update/logo/${id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${localStorage.accessToken}`
-        }
-      })
-      .then(resp => {
-        setVendor(null)
-        setUploadLogo(null)
-        toast.success(resp.data.message)
-        return true
-      })
-      .catch(error => {
-        toast.error(
-          `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
-        )
-        if (error.response && error.response.status == 401) {
-          auth.logout()
-        }
-      })
-  }
-
+  //----------
+  //  Actions - Update Vendor
+  //----------
   const updateVendor = () => {
     setOpen(true)
     axios
@@ -258,6 +323,9 @@ const AllVendorList = () => {
       })
   }
 
+  //----------
+  //  Actions - Edit Vendor Bank
+  //----------
   const editVendorBank = id => {
     setOpen(true)
     let type = 'bank'
@@ -270,6 +338,10 @@ const AllVendorList = () => {
       setOpen(false)
     }
   }
+
+  //----------
+  //  Actions - Change Vendor
+  //----------
   const editVendor = id => {
     setOpen(true)
     setVendor(originalVendor)
@@ -284,6 +356,9 @@ const AllVendorList = () => {
     }
   }
 
+  //----------
+  //  Actions - Update Vendor
+  //----------
   const updateVendorBank = () => {
     setOpen(true)
     setVendor(originalVendor)
@@ -325,6 +400,9 @@ const AllVendorList = () => {
       })
   }
 
+  //----------
+  //  Actions - Call Vendor Fetch API
+  //----------
   const callVendorFetchApi = (id, type) => {
     axios
       .get(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/vendor/list/${id}`, {
@@ -352,29 +430,53 @@ const AllVendorList = () => {
         }
       })
   }
-  const handleGalleryUpload = event => {
-    setUploadGallery(event.target.files)
+
+  //----------
+  //  Change Vendor
+  //----------
+  const changeVendor = event => {
+    let { name, value } = event.target
+
+    if (name == 'country') {
+      countries.forEach(c => {
+        if (c.name == value) {
+          setVendor(v => ({
+            ...v,
+            [name]: value,
+            phonecode: c.phonecode
+          }))
+        }
+      })
+    } else {
+      setVendor(v => ({
+        ...v,
+        [name]: value
+      }))
+    }
   }
 
-  const handleLogoUpload = event => {
-    const selectedImage = event.target.files[0]
-    setUploadLogo(selectedImage)
-  }
+  //----------
+  //  Table Configuration
+  //----------
   const columnss = [
     {
       title: 'Sr. No',
       render: (_, object, index) => index + 1 + (pagination.current - 1) * pagination.pageSize
     },
-    
+
     {
       title: 'User Id',
       dataIndex: 'user_id',
       sorter: {
         compare: (a, b) => a.user_id.localeCompare(b.user_id),
-        multiple: 2,
+        multiple: 2
       },
       render: (_, object, index) => (
-        <Link sx={{textDecoration:'underline'}} href='javascript:void(0)' onClick={() => setAccessToken(object.user_id)}>
+        <Link
+          sx={{ textDecoration: 'underline' }}
+          href='javascript:void(0)'
+          onClick={() => setAccessToken(object.user_id)}
+        >
           {object.user_id}
         </Link>
       ),
@@ -416,7 +518,7 @@ const AllVendorList = () => {
             .toLowerCase()
             .trim()
             .includes(value.replace(' ', '').toLowerCase().trim()) ||
-          String(record?.credit_limit|| '')
+          String(record?.credit_limit || '')
             .replace(' ', '')
             .toLowerCase()
             .trim()
@@ -441,28 +543,24 @@ const AllVendorList = () => {
       dataIndex: 'username',
       sorter: {
         compare: (a, b) => a.username.localeCompare(b.username),
-        multiple: 2,
-      },
+        multiple: 2
+      }
     },
     {
       title: 'Business/Company Name',
       sorter: {
         compare: (a, b) => a.username.localeCompare(b.username),
-        multiple: 2,
+        multiple: 2
       },
-      render: (_, object, index) => (
-        <Typography>
-       {object.first_name + ' ' + object.last_name}
-        </Typography>
-      )
+      render: (_, object, index) => <Typography>{object.first_name + ' ' + object.last_name}</Typography>
     },
-   
+
     {
       title: 'Registration Date',
       dataIndex: 'registration_date',
       sorter: {
         compare: (a, b) => a.username.localeCompare(b.username),
-        multiple: 2,
+        multiple: 2
       },
       render: (text, record) => new Date(record.registration_date).toLocaleDateString()
     },
@@ -470,49 +568,47 @@ const AllVendorList = () => {
       title: 'Commission Percent',
       dataIndex: 'commission_percent',
       sorter: {
-        compare: (a, b) => a.commission_percent-b.commission_percent,
-        multiple: 2,
-      },
-      
+        compare: (a, b) => a.commission_percent - b.commission_percent,
+        multiple: 2
+      }
     },
     {
       title: 'Credit Limit',
       dataIndex: 'credit_limit',
       sorter: {
         compare: (a, b) => a.username.localeCompare(b.username),
-        multiple: 2,
-      },
-      
+        multiple: 2
+      }
     },
     {
       title: 'Available Credit Limit',
       dataIndex: 'available_credit_limit',
       sorter: {
         compare: (a, b) => a.username.localeCompare(b.username),
-        multiple: 2,
+        multiple: 2
       },
-      render: (text, record) => (record.credit_limit - record.due_amount).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+      render: (text, record) =>
+        (record.credit_limit - record.due_amount).toLocaleString(undefined, { minimumFractionDigits: 2 })
     },
     {
       title: 'Commission Due',
       dataIndex: 'due_amount',
       sorter: {
         compare: (a, b) => a.username.localeCompare(b.username),
-        multiple: 2,
-      },
-      
+        multiple: 2
+      }
     },
     {
       title: 'Action',
       render: (_, object, index) => (
         <>
-         <Grid spacing={0}>
-            <Grid item sx={{ display:'flex' }}>
-              <Link href='javascript:void(0)' onClick={() => editVendor(object.id)} sx={{ mr: 5,display:'flex' }}>
+          <Grid spacing={0}>
+            <Grid item sx={{ display: 'flex' }}>
+              <Link href='javascript:void(0)' onClick={() => editVendor(object.id)} sx={{ mr: 5, display: 'flex' }}>
                 Edit
               </Link>
-            
-              <Link href='javascript:void(0)' onClick={() => editVendorBank(object.id)}  sx={{ mr: 5,display:'flex' }}>
+
+              <Link href='javascript:void(0)' onClick={() => editVendorBank(object.id)} sx={{ mr: 5, display: 'flex' }}>
                 Bank Details
               </Link>
             </Grid>
@@ -520,25 +616,25 @@ const AllVendorList = () => {
         </>
       )
     },
- 
+
     {
       title: 'Action',
       render: (_, object, index) => (
         <>
-         <Link
-          href='javascript:void(0)'
-          data-status={object.user_status}
-          data-id={object.user_id}
-          onClick={changeUserStatus}
-        >
-          {object.user_status == 1 ? 'Inactive' : 'Active'}
-        </Link>
+          <Link
+            href='javascript:void(0)'
+            data-status={object.user_status}
+            data-id={object.user_id}
+            onClick={changeUserStatus}
+          >
+            {object.user_status == 1 ? 'Inactive' : 'Active'}
+          </Link>
         </>
       )
     },
 
     // { field: 'location', headerName: 'Location', width: 150, renderCell: params =>  <Link href={params.row.location} target='__blank'>{params.row.location}</Link> },
-  
+
     {
       field: 'user_status',
       headerName: 'Login Status',
@@ -555,33 +651,10 @@ const AllVendorList = () => {
       )
     }
   ]
-  const changeVendor = event => {
-    let { name, value } = event.target
-    // vendor[key] = event.target.value
-    // if(name == 'country'){
-    //   countries.forEach(c=>{
-    //     if(c.name == event.target.value){
-    //       vendor.phonecode = c.phonecode
-    //     }
-    //   })
-    // }
-    if (name == 'country') {
-      countries.forEach(c => {
-        if (c.name == value) {
-          setVendor(v => ({
-            ...v,
-            [name]: value,
-            phonecode: c.phonecode
-          }))
-        }
-      })
-    } else {
-      setVendor(v => ({
-        ...v,
-        [name]: value
-      }))
-    }
-  }
+
+  //----------
+  //  JSX
+  //----------
   return (
     <>
       <Grid item xs={12}>
@@ -607,7 +680,7 @@ const AllVendorList = () => {
           <Table
             columns={columnss}
             dataSource={data}
-            loading={tableLoading}
+            loading={false}
             sortDirections={sorter}
             pagination={
               data?.length > 10
@@ -620,7 +693,7 @@ const AllVendorList = () => {
                     pageSizeOptions: ['10', '20', '50', '100'],
                     locale: { items_per_page: '' }
                   }
-                : false   
+                : false
             }
             onChange={pagination => setPagination(pagination)}
           />

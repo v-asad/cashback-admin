@@ -1,0 +1,96 @@
+{
+  "packages": [
+    "@mui/material",
+    "@mui/x-date-pickers-pro",
+    "@mui/x-date-pickers-pro/DateRangePicker",
+    "@mui/x-date-pickers-pro/AdapterDayjs",
+    "@mui/x-data-grid",
+    "@mui/icons-material",
+    "react-hot-toast",
+    "axios",
+    "antd",
+    "react-simple-maps",
+    "highcharts",
+    "yup",
+    "react-hook-form",
+    "@hookform/resolvers/yup",
+    "@mui/base",
+    "xlsx",
+    "@popperjs/core",
+    "@emotion/server/create-instance",
+    "react-redux",
+    "nprogress",
+    "@emotion/react"
+  ],
+  "components": {
+    "_app": [
+      "src/store",
+      "src/@core/utils/create-emotion-cache",
+      "src/configs/i18n",
+      "src/configs/acl",
+      "src/configs/themeConfig"
+    ],
+    "document": ["src/@core/utils/create-emotion-cache"],
+    "admin-revenue-report": [],
+    "commission-management": {
+      "manage": []
+    },
+    "dashboard": [],
+    "edit-open-ticket": [],
+    "ewallet-history-view": [],
+    "login": ["src/@core/layouts/BlankLayout", "src/@core/components/icon"],
+    "manage-ewallet-fund": [],
+    "manage-video": [],
+    "member-edit": [],
+    "member-management": {
+      "add-member": [],
+      "all-member-genealogy": [],
+      "member-edit": [],
+      "password-tracker": []
+    },
+    "official-announcement": [],
+    "payout-managemnt": {
+      "all-payout-list": [],
+      "generate-payout-list": [],
+      "member-closing-list": []
+    },
+    "policy-manage": [],
+    "query-tickets-management": {
+      "close-ticket-managemnt": [],
+      "open-ticket-management": []
+    },
+    "reports-managemnt": {
+      "member-package-report": [],
+      "paid-cofounder-income-report": [],
+      "paid-level-bonus-report": [],
+      "unpaid-cofounder-income-report": [],
+      "unpaid-level-bonus-report": []
+    },
+    "setting-management": {
+      "change-password": [],
+      "change-portfolio-photo": [],
+      "policy-content-update": [],
+      "user-block-management": [],
+      "withdrawal-request": []
+    },
+    "shopping-invoice-detail": [],
+    "vendor-edit": [],
+    "vendor-management": {
+      "add-new-service": [],
+      "add-new-vendor": [],
+      "our-vendors": [],
+      "vendor-invoice": [],
+      "vendor-list": [],
+      "vendor-payment-request": [],
+      "vendor-sales-report": []
+    },
+    "vendor-report-view-detail": [],
+    "wallet-managemnt": {
+      "manage-user-ewallet": []
+    },
+    "withdrawal-management": {
+      "close-withdrawal-request": [],
+      "open-withdrawal-request": []
+    }
+  }
+}

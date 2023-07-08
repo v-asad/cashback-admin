@@ -1,37 +1,12 @@
-import TextField from '@mui/material/TextField'
-import Grid from '@mui/material/Grid'
-import Button from '@mui/material/Button'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import { DataGrid } from '@mui/x-data-grid'
-import Card from '@mui/material/Card'
-import { useEffect, useState } from 'react'
-import axios from 'axios'
-import { useAuth } from 'src/hooks/useAuth'
-import CardContent from '@mui/material/CardContent'
-import Icon from 'src/@core/components/icon'
+//----------
+// MUI Imports
+//----------
+import { Grid, Button, Box, Typography, Card, CardContent, TextField } from '@mui/material'
 
 const EditOpenTicket = () => {
-  const auth = useAuth()
-  const [data, setData] = useState([])
-
-  const columns = [
-    { field: 'id', headerName: 'ID', width: 100 },
-    { field: 'name', headerName: 'Name', width: 200 },
-    { field: 'email', headerName: 'Email', width: 350 },
-    {
-      field: 'date',
-      headerName: 'Subscription Date',
-      width: 250,
-      renderCell: params => {
-        // convert date here
-        const updatedValue = params.row.date
-
-        // when completed, return the column data
-        return updatedValue
-      }
-    }
-  ]
+  //----------
+  //  JSX
+  //----------
   return (
     <>
       <Grid item xs={12}>

@@ -1,90 +1,133 @@
-import TextField from '@mui/material/TextField'
-import Grid from '@mui/material/Grid'
-import Button from '@mui/material/Button'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import { DataGrid } from '@mui/x-data-grid'
-import Card from '@mui/material/Card'
+//----------
+//  React Imports
+//----------
 import { useEffect, useState } from 'react'
-import axios from 'axios'
-import { useAuth } from 'src/hooks/useAuth'
-import CardContent from '@mui/material/CardContent'
-import Icon from 'src/@core/components/icon'
+import { useRouter } from 'next/router'
+
+//----------
+// MUI Imports
+//----------
+import { Grid, Button, Box, Typography, Card, CardContent, Backdrop, CircularProgress, Link } from '@mui/material'
+import { DataGrid } from '@mui/x-data-grid'
+
+//----------
+// Other library Imports
+//----------
 import { toast } from 'react-hot-toast'
-import Link from '@mui/material/Link';
-import { Router, useRouter } from 'next/router'
-import Backdrop from '@mui/material/Backdrop';
-import CircularProgress from '@mui/material/CircularProgress';
+import axios from 'axios'
+
+//----------
+// Local Imports
+//----------
+import { useAuth } from 'src/hooks/useAuth'
+
 const GeneratePayoutList = () => {
-  const auth = useAuth()
+  //----------
+  //  States
+  //----------
   const [data, setData] = useState([])
   const [selectedRows, setSelectedRows] = useState([])
   const [open, setOpen] = useState(false)
+
+  //----------
+  //  Hooks
+  //----------
+  const auth = useAuth()
   const router = useRouter()
-  const loadData = () => {
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/payout-mgt/generate-payout-list`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.accessToken}`
-        }
-      })
-      .then(response => {
-        const tempData = response.data.data.map((d, key) => {
-          return { key, ...d }
-        })
-        setData(tempData)
-      })
-      .catch(error => {
-        toast.error(
-          `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
-        )
-        if (error.response && error.response.status == 401) {
-          auth.logout()
-        }
-      })
-  }
+
+  //----------
+  //  Effects
+  //----------
   useEffect(() => {
-    loadData()
-  }, [])
-  const setAccessToken = (user_id) => {
-    let url = `${process.env.NEXT_PUBLIC_USER_DASH}dashboard?__sid=${encodeURI(localStorage.accessToken)}&__uid=${encodeURI(user_id)}`
-    window.open(url, '_blank', 'noreferrer')
-  }
-
-  
-  const columns = [
-    { field: '', headerName: '#', width: 40, renderCell: params => params.row.key + 1 },
-    { field: 'userId', headerName: 'User Id', width: 200, renderCell: params => <Link href='javascript:void(0)' onClick={() => setAccessToken(params.row.userId)}>{params.row.userId}</Link> },
-    {
-      field: 'fullName',
-      headerName: 'fullName',
-      width: 250,
-      
-    },
-    { field: 'packagename', headerName: 'Member Name', width: 200, renderCell: params => `${ params.row.package.name } [${ params.row.package.amount }]` },
-    
-    {
-      field: 'selfPurchase',
-      headerName: 'Self Purchase',
-      width: 150,
-      
-    },
-    { field: 'levelIncome', headerName: 'Level Income', width: 150,  },
-    { field: 'coFounderIncome', headerName: 'Co Founder Income', width: 150, },
-    { field: 'total', headerName: 'Total', width: 150, },
-  ]
-
-  const generateHandler = () => {
-    if(selectedRows){
-      setOpen(true)
+    const loadData = () => {
       axios
-        .post(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/payout-mgt/generate-payout-list`,{
-          list: selectedRows
-        }, {
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/payout-mgt/generate-payout-list`, {
           headers: {
             Authorization: `Bearer ${localStorage.accessToken}`
           }
         })
+        .then(response => {
+          const tempData = response.data.data.map((d, key) => {
+            return { key, ...d }
+          })
+          setData(tempData)
+        })
+        .catch(error => {
+          toast.error(
+            `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
+          )
+          if (error.response && error.response.status == 401) {
+            auth.logout()
+          }
+        })
+    }
+
+    loadData()
+  }, [])
+
+  //----------
+  //  Table Configuration
+  //----------
+  const columns = [
+    { field: '', headerName: '#', width: 40, renderCell: params => params.row.key + 1 },
+    {
+      field: 'userId',
+      headerName: 'User Id',
+      width: 200,
+
+      renderCell: params => (
+        <Link href='javascript:void(0)' onClick={() => setAccessToken(params.row.userId)}>
+          {params.row.userId}
+        </Link>
+      )
+    },
+    {
+      field: 'fullName',
+      headerName: 'fullName',
+      width: 250
+    },
+    {
+      field: 'packagename',
+      headerName: 'Member Name',
+      width: 200,
+      renderCell: params => `${params.row.package.name} [${params.row.package.amount}]`
+    },
+
+    {
+      field: 'selfPurchase',
+      headerName: 'Self Purchase',
+      width: 150
+    },
+    { field: 'levelIncome', headerName: 'Level Income', width: 150 },
+    { field: 'coFounderIncome', headerName: 'Co Founder Income', width: 150 },
+    { field: 'total', headerName: 'Total', width: 150 }
+  ]
+
+  //----------
+  //  Handlers
+  //----------
+  const setAccessToken = user_id => {
+    let url = `${process.env.NEXT_PUBLIC_USER_DASH}dashboard?__sid=${encodeURI(
+      localStorage.accessToken
+    )}&__uid=${encodeURI(user_id)}`
+    window.open(url, '_blank', 'noreferrer')
+  }
+
+  const generateHandler = () => {
+    if (selectedRows) {
+      setOpen(true)
+      axios
+        .post(
+          `${process.env.NEXT_PUBLIC_API_URL}/controlpanel/payout-mgt/generate-payout-list`,
+          {
+            list: selectedRows
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.accessToken}`
+            }
+          }
+        )
         .then(response => {
           setOpen(false)
           toast.success(response.data.message)
@@ -102,6 +145,9 @@ const GeneratePayoutList = () => {
     }
   }
 
+  //----------
+  //  JSX
+  //----------
   return (
     <>
       <Grid item xs={12}>
@@ -112,7 +158,12 @@ const GeneratePayoutList = () => {
         </Box>
       </Grid>
       <Grid item xs={12}>
-        <Button variant='contained' sx={{ mr: 2,mb:10 }} onClick={generateHandler} disabled={selectedRows.length > 0 ? false:true}>
+        <Button
+          variant='contained'
+          sx={{ mr: 2, mb: 10 }}
+          onClick={generateHandler}
+          disabled={selectedRows.length > 0 ? false : true}
+        >
           Generate
         </Button>
       </Grid>
@@ -127,12 +178,14 @@ const GeneratePayoutList = () => {
             rowsPerPageOptions={[10]}
             autoHeight
             checkboxSelection
-            onSelectionModelChange={(newSelection) => {setSelectedRows(newSelection)}}
+            onSelectionModelChange={newSelection => {
+              setSelectedRows(newSelection)
+            }}
           />
         </CardContent>
       </Card>
-      <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={open}>
-        <CircularProgress color="inherit" />
+      <Backdrop sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }} open={open}>
+        <CircularProgress color='inherit' />
       </Backdrop>
     </>
   )

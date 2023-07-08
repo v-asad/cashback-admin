@@ -1,26 +1,50 @@
-import TextField from '@mui/material/TextField'
-import Grid from '@mui/material/Grid'
-import Button from '@mui/material/Button'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import { DataGrid } from '@mui/x-data-grid'
-import Card from '@mui/material/Card'
+//----------
+//  React Imports
+//----------
 import { useEffect, useState } from 'react'
-import axios from 'axios'
-import { useAuth } from 'src/hooks/useAuth'
-import CardContent from '@mui/material/CardContent'
-import { toast } from 'react-hot-toast'
-import Icon from 'src/@core/components/icon'
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material'
 import { useRouter } from 'next/router'
-import OutlinedInput from '@mui/material/OutlinedInput';
-import IconButton from '@mui/material/IconButton';
-import InputAdornment from '@mui/material/InputAdornment';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
+
+//----------
+// MUI Imports
+//----------
+import {
+  Grid,
+  Button,
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  TextField,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  OutlinedInput,
+  IconButton,
+  InputAdornment
+} from '@mui/material'
+
+//----------
+// MUI Icon Imports
+//----------
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
+
+//----------
+// Other library Imports
+//----------
+import { toast } from 'react-hot-toast'
+import axios from 'axios'
+
+//----------
+// Local Imports
+//----------
+import { useAuth } from 'src/hooks/useAuth'
 
 const AddNewMember = () => {
-  const auth = useAuth()
+  //----------
+  //  States
+  //----------
   const [packages, setPackages] = useState([])
   const [countries, setCountries] = useState([])
   const [sponsorId, setSponsorId] = useState(null)
@@ -35,90 +59,112 @@ const AddNewMember = () => {
   const [country, setCountry] = useState(null)
   const [phonecode, setPhonecode] = useState(null)
   const [telephone, setTelephone] = useState(null)
-  const [showPassword, setShowPassword] = useState(false);
-  let router = useRouter()
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
-  const loadPackages = () => {
-    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/packages`)
-      .then(response => {
-        setPackages(response.data)
-      })
-      .catch(error => {
-        toast.error(`${error.response? error.response.status:''}: ${error.response?error.response.data.message:error}`);
-      })
-  }
+  const [showPassword, setShowPassword] = useState(false)
 
-  const loadCountries = () => {
-    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/countries`)
-      .then(response => {
-        setCountries(response.data)
-      })
-      .catch(error => {
-        toast.error(`${error.response? error.response.status:''}: ${error.response?error.response.data.message:error}`);
-      })
-  }
+  //----------
+  //  Hooks
+  //----------
+  const auth = useAuth()
+  let router = useRouter()
+
+  //----------
+  //  Effects
+  //----------
   useEffect(() => {
+    const loadPackages = () => {
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/packages`)
+        .then(response => {
+          setPackages(response.data)
+        })
+        .catch(error => {
+          toast.error(
+            `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
+          )
+        })
+    }
     loadPackages()
+
+    const loadCountries = () => {
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/countries`)
+        .then(response => {
+          setCountries(response.data)
+        })
+        .catch(error => {
+          toast.error(
+            `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
+          )
+        })
+    }
     loadCountries()
   }, [])
 
-  const submitProfileHandler = (event) => {
+  //----------
+  //  Handlers
+  //----------
+  const handleClickShowPassword = () => setShowPassword(show => !show)
+  const handleMouseDownPassword = event => event.preventDefault()
+  const submitProfileHandler = () => {
     let updateArr = {
-        "sponsorid": sponsorId,
-        "platform": platform,
-        "username": username,
-        "password": password,
-        "confirm_password": confirmPassword,
-        "transaction_pwd1": "",
-        "firstname": firstname,
-        "lastname": lastname,
-        "email": email,
-        "confirm_email": confirmEmail,
-        "country": country,
-        "phonecode": phonecode,
-        "mobile": telephone,
-        "term_cond": "yes"
+      sponsorid: sponsorId,
+      platform: platform,
+      username: username,
+      password: password,
+      confirm_password: confirmPassword,
+      transaction_pwd1: '',
+      firstname: firstname,
+      lastname: lastname,
+      email: email,
+      confirm_email: confirmEmail,
+      country: country,
+      phonecode: phonecode,
+      mobile: telephone,
+      term_cond: 'yes'
     }
-    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/member/create`, updateArr, {
-      headers: {
-        "Authorization": `Bearer ${localStorage.accessToken}`
-      }
-    })
+    axios
+      .post(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/member/create`, updateArr, {
+        headers: {
+          Authorization: `Bearer ${localStorage.accessToken}`
+        }
+      })
       .then(resp => {
         let data = resp.data
-        if(data.success){
+        if (data.success) {
           toast.success(data.message)
           router.replace('/member-management/all-member-list')
-        }else{
+        } else {
           toast.error(data.message)
         }
       })
       .catch(error => {
-        if(error.response && error.response.data){
-          if(error.response.data && error.response.data.message){
-            toast.error(`${error.response? error.response.status:''}: ${error.response?error.response.data.message:error}`);
+        if (error.response && error.response.data) {
+          if (error.response.data && error.response.data.message) {
+            toast.error(
+              `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
+            )
           }
-          if(error.response.data && error.response.data.errors){
+          if (error.response.data && error.response.data.errors) {
             error.response.data.errors.map(err => toast.error(err.msg))
           }
         }
         if (error.response && error.response.status == 401) {
-          auth.logout();
+          auth.logout()
         }
       })
   }
-
-  const handleCountryChange = (event) => {
+  const handleCountryChange = event => {
     setCountry(event.target.value)
-    countries.forEach(c=>{
-      if(c.name == event.target.value){
+    countries.forEach(c => {
+      if (c.name == event.target.value) {
         setPhonecode(c.phonecode)
       }
     })
   }
+
+  //----------
+  //  JSX
+  //----------
   return (
     <>
       <Card component='div' sx={{ position: 'relative', mb: 7 }}>
@@ -133,107 +179,164 @@ const AddNewMember = () => {
 
           <Grid container spacing={3}>
             <Grid item md={6} xs={12}>
-              <TextField xs={6} fullWidth label='Sponsor Information' onChange={(e) => setSponsorId(e.target.value)} value={sponsorId} placeholder='Sponsor ID' />
+              <TextField
+                xs={6}
+                fullWidth
+                label='Sponsor Information'
+                onChange={e => setSponsorId(e.target.value)}
+                value={sponsorId}
+                placeholder='Sponsor ID'
+              />
             </Grid>
             <Grid item md={6} xs={12}>
               <FormControl xs={6} fullWidth>
-                <InputLabel id="demo-simple-select-label">Select Package</InputLabel>
-                <Select
-                  fullWidth
-                  label='Select Package'
-                  onChange={(e) => setPlatform(e.target.value)}
-                >
-                  {packages&&packages.map(
-                    (pack) => <MenuItem value={pack.id}>{pack.name} ({pack.amount})</MenuItem>
-                  )}
+                <InputLabel id='demo-simple-select-label'>Select Package</InputLabel>
+                <Select fullWidth label='Select Package' onChange={e => setPlatform(e.target.value)}>
+                  {packages &&
+                    packages.map(pack => (
+                      <MenuItem value={pack.id}>
+                        {pack.name} ({pack.amount})
+                      </MenuItem>
+                    ))}
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} md={4}>
-              <TextField xs={6} fullWidth label='Create Login Information' onChange={(e) => setUsername(e.target.value)} value={username} placeholder='Enter User Name' />
+              <TextField
+                xs={6}
+                fullWidth
+                label='Create Login Information'
+                onChange={e => setUsername(e.target.value)}
+                value={username}
+                placeholder='Enter User Name'
+              />
             </Grid>
             <Grid item md={4} xs={6}>
-              <FormControl variant="outlined">
-                <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+              <FormControl variant='outlined'>
+                <InputLabel htmlFor='outlined-adornment-password'>Password</InputLabel>
                 <OutlinedInput
-                  id="outlined-adornment-password"
+                  id='outlined-adornment-password'
                   type={showPassword ? 'text' : 'password'}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                   endAdornment={
-                    <InputAdornment position="end">
+                    <InputAdornment position='end'>
                       <IconButton
-                        aria-label="toggle password visibility"
+                        aria-label='toggle password visibility'
                         onClick={handleClickShowPassword}
                         onMouseDown={handleMouseDownPassword}
-                        edge="end"
+                        edge='end'
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
                   }
-                  label="Password"
+                  label='Password'
                 />
               </FormControl>
             </Grid>
             <Grid item md={4} xs={6}>
-              <FormControl variant="outlined">
-                <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+              <FormControl variant='outlined'>
+                <InputLabel htmlFor='outlined-adornment-password'>Password</InputLabel>
                 <OutlinedInput
-                  id="outlined-adornment-password"
+                  id='outlined-adornment-password'
                   type={showPassword ? 'text' : 'password'}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={e => setConfirmPassword(e.target.value)}
                   endAdornment={
-                    <InputAdornment position="end">
+                    <InputAdornment position='end'>
                       <IconButton
-                        aria-label="toggle password visibility"
+                        aria-label='toggle password visibility'
                         onClick={handleClickShowPassword}
                         onMouseDown={handleMouseDownPassword}
-                        edge="end"
+                        edge='end'
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
                   }
-                  label="Password"
+                  label='Password'
                 />
               </FormControl>
             </Grid>
             <Grid item xs={12}>
-              <TextField xs={6} fullWidth label='First Name' onChange={(e) => setFirstname(e.target.value)} value={firstname} placeholder='Enter First Name' />
+              <TextField
+                xs={6}
+                fullWidth
+                label='First Name'
+                onChange={e => setFirstname(e.target.value)}
+                value={firstname}
+                placeholder='Enter First Name'
+              />
             </Grid>
             <Grid item md={6} xs={12}>
-              <TextField xs={6} fullWidth label='Last Name' onChange={(e) => setLastname(e.target.value)} value={lastname} placeholder='Enter Last Name' />
+              <TextField
+                xs={6}
+                fullWidth
+                label='Last Name'
+                onChange={e => setLastname(e.target.value)}
+                value={lastname}
+                placeholder='Enter Last Name'
+              />
             </Grid>
             <Grid item md={6} xs={12}>
-              <TextField xs={6} fullWidth label='Email' onChange={(e) => setEmail(e.target.value)} value={email} placeholder='Enter Email' />
+              <TextField
+                xs={6}
+                fullWidth
+                label='Email'
+                onChange={e => setEmail(e.target.value)}
+                value={email}
+                placeholder='Enter Email'
+              />
             </Grid>
             <Grid item md={6} xs={12}>
-              <TextField fullWidth onChange={(e) => setConfirmEmail(e.target.value)} value={confirmEmail} label='Confirm Email' placeholder='Confirm Email' />
+              <TextField
+                fullWidth
+                onChange={e => setConfirmEmail(e.target.value)}
+                value={confirmEmail}
+                label='Confirm Email'
+                placeholder='Confirm Email'
+              />
             </Grid>
             <Grid item md={6} xs={12}>
               <Box sx={{ minWidth: 120 }}>
                 <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">Country</InputLabel>
+                  <InputLabel id='demo-simple-select-label'>Country</InputLabel>
                   <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    label="Country"
+                    labelId='demo-simple-select-label'
+                    id='demo-simple-select'
+                    label='Country'
                     placeholder='Select Country'
                     onChange={handleCountryChange}
                   >
-                    {countries.map(c=><MenuItem value={c.name} selected={c.name == country}>{c.name}</MenuItem>)}
+                    {countries.map(c => (
+                      <MenuItem value={c.name} selected={c.name == country}>
+                        {c.name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Box>
             </Grid>
             <Grid item md={2} xs={3}>
-              <TextField fullWidth label='Phonecode' placeholder='Enter Phone code' disabled onChange={e => setPhonecode(e.target.value)} value={phonecode}  />
+              <TextField
+                fullWidth
+                label='Phonecode'
+                placeholder='Enter Phone code'
+                disabled
+                onChange={e => setPhonecode(e.target.value)}
+                value={phonecode}
+              />
             </Grid>
             <Grid item md={4} xs={9}>
-              <TextField fullWidth label='Mobile' onChange={(e) => setTelephone(e.target.value)} value={telephone} placeholder='Enter Mobile Phone' />
+              <TextField
+                fullWidth
+                label='Mobile'
+                onChange={e => setTelephone(e.target.value)}
+                value={telephone}
+                placeholder='Enter Mobile Phone'
+              />
             </Grid>
 
-            <Grid item  xs={12}>
+            <Grid item xs={12}>
               <Button variant='contained' sx={{ mr: 2 }} onClick={submitProfileHandler}>
                 Register
               </Button>

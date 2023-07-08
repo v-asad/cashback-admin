@@ -1,56 +1,81 @@
-import TextField from '@mui/material/TextField'
-import Grid from '@mui/material/Grid'
-import Button from '@mui/material/Button'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import { DataGrid } from '@mui/x-data-grid'
-import Card from '@mui/material/Card'
+//----------
+//  React Imports
+//----------
 import { useEffect, useState } from 'react'
-import axios from 'axios'
-import { useAuth } from 'src/hooks/useAuth'
-import CardContent from '@mui/material/CardContent'
+
+//----------
+// MUI Imports
+//----------
+import { Grid, Box, Typography, Card, CardContent } from '@mui/material'
+
+//----------
+// Other library Imports
+//----------
 import { toast } from 'react-hot-toast'
 import { Table, Input } from 'antd'
-import Icon from 'src/@core/components/icon'
+import axios from 'axios'
+
+//----------
+// Local Imports
+//----------
+import { useAuth } from 'src/hooks/useAuth'
+
+//----------
+//  Constants
+//----------
+const sorter = ['ascend', 'descend']
+
 const PaidCoFounderReport = () => {
-  const auth = useAuth()
+  //----------
+  //  States
+  //----------
   const [data, setData] = useState([])
   const [totalCommision, settotalCommision] = useState(0)
   const [tableLoading, setTableLoading] = useState(false)
-  const sorter = ['ascend', 'descend'];
   const [pagination, setPagination] = useState({
     pageSize: 10, // Initial page size
     current: 1 // Initial current page
   })
   const [searchedText, setSearchedText] = useState('')
 
-  const loadData = () => {
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/report-management/paid-cofounder-income`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.accessToken}`
-        }
-      })
-      .then(response => {
-        settotalCommision(response.data.totalCommision)
-        const tempData = response.data.data.map((d, key) => {
-          return { key, ...d }
-        })
-        setData(tempData)
-      })
-      .catch(error => {
-        
-        toast.error(
-          `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
-        )
-        if (error.response && error.response.status == 401) {
-          auth.logout()
-        }
-      })
-  }
+  //----------
+  //  Hooks
+  //----------
+  const auth = useAuth()
+
+  //----------
+  //  Effects
+  //----------
   useEffect(() => {
+    const loadData = () => {
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/report-management/paid-cofounder-income`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.accessToken}`
+          }
+        })
+        .then(response => {
+          settotalCommision(response.data.totalCommision)
+          const tempData = response.data.data.map((d, key) => {
+            return { key, ...d }
+          })
+          setData(tempData)
+        })
+        .catch(error => {
+          toast.error(
+            `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
+          )
+          if (error.response && error.response.status == 401) {
+            auth.logout()
+          }
+        })
+    }
     loadData()
   }, [])
+
+  //----------
+  //  Table Configuration
+  //----------
   const columns = [
     {
       title: 'Sr. No',
@@ -61,7 +86,7 @@ const PaidCoFounderReport = () => {
       dataIndex: 'userId',
       sorter: {
         compare: (a, b) => a.receiverUserId.localeCompare(b.receiverUserId),
-        multiple: 2,
+        multiple: 2
       },
       filteredValue: [searchedText],
       onFilter: (value, record) => {
@@ -100,87 +125,86 @@ const PaidCoFounderReport = () => {
             .replace(' ', '')
             .toLowerCase()
             .trim()
-            .includes(value.replace(' ', '').toLowerCase().trim()) 
+            .includes(value.replace(' ', '').toLowerCase().trim())
         )
       }
     },
-    
+
     {
       title: 'USERNAME',
       dataIndex: 'username',
       sorter: {
         compare: (a, b) => a.username.localeCompare(b.username),
-        multiple: 2,
-      },
+        multiple: 2
+      }
     },
     {
       title: 'PurchasedAmount',
       dataIndex: 'purchasedAmount',
       sorter: {
-        compare: (a, b) => a.purchasedAmount-b.purchasedAmount,
-        multiple: 2,
-      },
+        compare: (a, b) => a.purchasedAmount - b.purchasedAmount,
+        multiple: 2
+      }
     },
     {
       title: 'Percentage',
       dataIndex: 'percentage',
       sorter: {
-        compare: (a, b) => a.percentage-b.percentage,
-        multiple: 2,
-      },
+        compare: (a, b) => a.percentage - b.percentage,
+        multiple: 2
+      }
     },
     {
       title: 'Amount',
       dataIndex: 'amount',
       sorter: {
-        compare: (a, b) => a.amount-b.amount,
-        multiple: 2,
-      },
+        compare: (a, b) => a.amount - b.amount,
+        multiple: 2
+      }
     },
     {
       title: 'Remark',
       dataIndex: 'remark',
       sorter: {
-        compare: (a, b) => a.remark-b.remark,
-        multiple: 2,
-      },
+        compare: (a, b) => a.remark - b.remark,
+        multiple: 2
+      }
     },
     {
       title: 'Purchased Invoice',
       dataIndex: 'purchasedInvoice',
       sorter: {
-        compare: (a, b) => a.purchasedInvoice-b.purchasedInvoice,
-        multiple: 2,
-      },
+        compare: (a, b) => a.purchasedInvoice - b.purchasedInvoice,
+        multiple: 2
+      }
     },
     {
       title: 'Date',
       dataIndex: 'date',
       sorter: {
         compare: (a, b) => a.date.localeCompare(b.date),
-        multiple: 2,
+        multiple: 2
       },
       render: (text, record) => new Date(record.date).toLocaleDateString()
-    },
-    
-
-    
-    
+    }
   ]
+
+  //----------
+  //  JSX
+  //----------
   return (
     <>
-    <Grid item xs={12}>
-        <Box >
-          <Typography variant='h5' sx={{my:8}}>Paid Co-Founder Income Report</Typography>
-
+      <Grid item xs={12}>
+        <Box>
+          <Typography variant='h5' sx={{ my: 8 }}>
+            Paid Co-Founder Income Report
+          </Typography>
         </Box>
       </Grid>
 
-      
-      
       <Card component='div' sx={{ position: 'relative', mb: 7 }}>
-      <CardContent>
-      <Input.Search
+        <CardContent>
+          <Input.Search
             placeholder='Search here.....'
             style={{ maxWidth: 300, marginBottom: 8, display: 'block', height: 50, float: 'right', border: 'black' }}
             onSearch={value => {
@@ -206,15 +230,15 @@ const PaidCoFounderReport = () => {
                     pageSizeOptions: ['10', '20', '50', '100'],
                     locale: { items_per_page: '' }
                   }
-                : false   
+                : false
             }
             onChange={pagination => setPagination(pagination)}
           />
-       
-         <Typography variant='div' sx={{ my: 2, fontWeight: 'bold',display:'block' }}>
-              Total Commission= {totalCommision.toFixed(2)}
-              </Typography>
-         </CardContent>
+
+          <Typography variant='div' sx={{ my: 2, fontWeight: 'bold', display: 'block' }}>
+            Total Commission= {totalCommision.toFixed(2)}
+          </Typography>
+        </CardContent>
       </Card>
     </>
   )

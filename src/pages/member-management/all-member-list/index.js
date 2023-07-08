@@ -1,39 +1,66 @@
-import TextField from '@mui/material/TextField'
-import Grid from '@mui/material/Grid'
-import Button from '@mui/material/Button'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import { DataGrid } from '@mui/x-data-grid'
-import Card from '@mui/material/Card'
+//----------
+//  React Imports
+//----------
 import { useCallback, useEffect, useRef, useState } from 'react'
-import axios from 'axios'
-import { useAuth } from 'src/hooks/useAuth'
-import CardContent from '@mui/material/CardContent'
-import Icon from 'src/@core/components/icon'
+
+//----------
+// MUI Imports
+//----------
+import {
+  Grid,
+  Button,
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  TextField,
+  Link,
+  Backdrop,
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
+} from '@mui/material'
+import { LocalizationProvider } from '@mui/x-date-pickers-pro'
+import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker'
+import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs'
+
+//----------
+// MUI Icon Imports
+//----------
+import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
+import FilterAltIcon from '@mui/icons-material/FilterAlt'
+
+//----------
+// Other library Imports
+//----------
+import { utils, writeFileXLSX } from 'xlsx'
 import { toast } from 'react-hot-toast'
-import Link from '@mui/material/Link'
-import Backdrop from '@mui/material/Backdrop'
-import CircularProgress from '@mui/material/CircularProgress'
-import List from '@mui/material/List'
-import ListItem from '@mui/material/ListItem'
-import ListItemText from '@mui/material/ListItemText'
-import { useRouter } from 'next/router'
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material'
-import { read, utils, writeFileXLSX } from 'xlsx'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogContentText from '@mui/material/DialogContentText'
-import DialogTitle from '@mui/material/DialogTitle'
-import { Table, Input } from 'antd'
-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
-import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
-import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { auto } from '@popperjs/core'
+import { Table, Input } from 'antd'
+import axios from 'axios'
+
+//----------
+// Local Imports
+//----------
+import { useAuth } from 'src/hooks/useAuth'
+
+//----------
+// Constants
+//----------
+const sorter = ['ascend', 'descend']
+const scroll = 'paper'
+
 const AllMemberList = () => {
-  const auth = useAuth()
+  //----------
+  //  States
+  //----------
   const [data, setData] = useState([])
   const [dataSource, setDataSource] = useState([])
   const [open, setOpen] = useState(false)
@@ -42,32 +69,81 @@ const AllMemberList = () => {
   const [editUser, setEditUser] = useState([])
   const [memberId, setMemberId] = useState(null)
   const [topupModalOpen, setTopupModalOpen] = useState(false)
-  const [scroll, setScroll] = useState('paper')
   const [topupAmount, setTopupAmount] = useState(null)
   const [topupUserId, setTopupUserId] = useState(null)
-  let router = useRouter()
-  const [tableLoading, setTableLoading] = useState(false)
   const [filterDateRange, setFilterDateRange] = useState([null, null])
-  const [filterMobile, setFilterMobile] = useState(null)
-  const [filterUserId, setFilterUserId] = useState(null)
-  const [filterUserName, setFilterUserName] = useState(null)
   const [pagination, setPagination] = useState({
     pageSize: 10, // Initial page size
     current: 1 // Initial current page
   })
   const [searchedText, setSearchedText] = useState('')
-  const loadCountries = () => {
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/countries`)
-      .then(response => {
-        setCountries(response.data)
-      })
-      .catch(error => {
-        toast.error(
-          `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
-        )
-      })
-  }
+
+  //----------
+  //  Hooks
+  //----------
+  const auth = useAuth()
+
+  //----------
+  //  Refs
+  //----------
+  const descriptionElementRef = useRef(null)
+
+  //----------
+  //  Effects
+  //----------
+  useEffect(() => {
+    const loadData = () => {
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/members/list`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.accessToken}`
+          }
+        })
+        .then(response => {
+          const tempData = response.data.map((d, key) => {
+            return { key, ...d }
+          })
+          setData(tempData)
+          setDataSource(tempData)
+        })
+        .catch(error => {
+          toast.error(
+            `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
+          )
+          if (error.response && error.response.status == 401) {
+            auth.logout()
+          }
+        })
+    }
+    loadData()
+
+    const loadCountries = () => {
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/countries`)
+        .then(response => {
+          setCountries(response.data)
+        })
+        .catch(error => {
+          toast.error(
+            `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
+          )
+        })
+    }
+    loadCountries()
+  }, [])
+
+  useEffect(() => {
+    if (open) {
+      const { current: descriptionElement } = descriptionElementRef
+      if (descriptionElement !== null) {
+        descriptionElement.focus()
+      }
+    }
+  }, [open])
+
+  //----------
+  //  XLSX Handlers - Export File
+  //----------
   const exportFile = useCallback(() => {
     const ws = utils.json_to_sheet(data)
     const wb = utils.book_new()
@@ -75,30 +151,13 @@ const AllMemberList = () => {
     writeFileXLSX(wb, 'SheetJSReactAoO.xlsx')
   }, [data])
 
-  const loadData = () => {
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/members/list`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.accessToken}`
-        }
-      })
-      .then(response => {
-        const tempData = response.data.map((d, key) => {
-          return { key, ...d }
-        })
-        setData(tempData)
-        setDataSource(tempData)
-      })
-      .catch(error => {
-        toast.error(
-          `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
-        )
-        if (error.response && error.response.status == 401) {
-          auth.logout()
-        }
-      })
+  //----------
+  //  Handlers
+  //----------
+  const handleClose = () => {
+    setEditModalOpen(false)
+    setTopupModalOpen(false)
   }
-
   const setAccessToken = user_id => {
     let url = `${process.env.NEXT_PUBLIC_USER_DASH}dashboard?__sid=${encodeURI(
       localStorage.accessToken
@@ -106,6 +165,9 @@ const AllMemberList = () => {
     window.open(url, '_blank', 'noreferrer')
   }
 
+  //----------
+  //  Table Actions - Change Co-founder status
+  //----------
   const changeCofounderStatus = event => {
     let user_id = event.target.getAttribute('data-id')
     let status = parseInt(event.target.getAttribute('data-status'))
@@ -143,24 +205,20 @@ const AllMemberList = () => {
       })
   }
 
+  //----------
+  //  Table Actions - Edit User Data
+  //----------
   const setEditUserData = index => event => {
     let value = event.target.value
     editUser[index] = value
     setEditUser(editUser)
     event.target.value = value
-    // let newArr = editUser
-    // newArr[index] = value
-    // if(index == 'country') {
-    //   countries.forEach(c=>{
-    //     if(c.name == value){
-    //       newArr['phonecode'] = c.phonecode
-    //     }
-    //   })
-    // }
-    // setEditUser(newArr)
     console.log(editUser, editUser.ref_id)
   }
 
+  //----------
+  //  Table Actions - Change User Status
+  //----------
   const changeUserStatus = event => {
     let user_id = event.target.getAttribute('data-id')
     let status = parseInt(event.target.getAttribute('data-status'))
@@ -197,30 +255,10 @@ const AllMemberList = () => {
         }
       })
   }
-  useEffect(() => {
-    loadData()
-    loadCountries()
-  }, [])
-  // edit modal
-  // const handleClickOpen = () => () => {
-  //   setEditModalOpen(true);
-  // };
 
-  const handleClose = () => {
-    setEditModalOpen(false)
-    setTopupModalOpen(false)
-  }
-  const descriptionElementRef = useRef(null)
-  useEffect(() => {
-    if (open) {
-      const { current: descriptionElement } = descriptionElementRef
-      if (descriptionElement !== null) {
-        descriptionElement.focus()
-      }
-    }
-  }, [open])
-
-  // topup api call
+  //----------
+  //  Table Actions - Update Member Topup
+  //----------
   const topupMember = () => {
     setOpen(true)
     axios
@@ -251,7 +289,9 @@ const AllMemberList = () => {
       })
   }
 
-  // edit modal
+  //----------
+  //  Table Actions - Update Member List
+  //----------
   const editMember = id => {
     setOpen(true)
     axios
@@ -277,6 +317,79 @@ const AllMemberList = () => {
       })
   }
 
+  //----------
+  //  Table Actions - Update Member
+  //----------
+  const updateMember = () => {
+    setOpen(true)
+    axios
+      .put(
+        `${process.env.NEXT_PUBLIC_API_URL}/controlpanel/member/update/${memberId}`,
+        {
+          action: 'update-profile',
+          first_name: editUser.first_name,
+          last_name: editUser.last_name,
+          username: editUser.username,
+          email: editUser.email,
+          address: editUser.address,
+          country: editUser.country,
+          phonecode: editUser.phonecode,
+          telephone: editUser.telephone,
+          state: editUser.state,
+          city: editUser.city,
+          dob: editUser.dob ? new Date().toISOString(editUser.dob).split('T')[0] : null,
+          sex: editUser.sex
+          // "password": "12345678",
+          // "t_code" : "12345678"
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.accessToken}`
+          }
+        }
+      )
+      .then(response => {
+        setOpen(false)
+        toast.success(response.data.message)
+        setEditModalOpen(false)
+      })
+      .catch(error => {
+        setOpen(false)
+        toast.error(
+          `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
+        )
+        if (error.response && error.response.status == 401) {
+          auth.logout()
+        }
+      })
+  }
+
+  //----------
+  //  Table Actions - Apply Filter
+  //----------
+  const applyFilter = () => {
+    let dateFrom = filterDateRange[0]['$d'].toLocaleDateString()
+    let dateTo = filterDateRange[1]['$d'].toLocaleDateString()
+    // let filter = dataSource.filter(d => (( filterUserId && d.user_id == filterUserId ) || ( filterUserName && d.username == filterUserName) || (new Date(d.registration_date) >= new Date(dateFrom) && new Date(d.registration_date) <= new Date(dateTo) )))
+    let filter = dataSource.filter(
+      d => new Date(d.registration_date) >= new Date(dateFrom) && new Date(d.registration_date) <= new Date(dateTo)
+    )
+    setData(filter)
+  }
+
+  //----------
+  //  Table Actions - Reset Filter
+  //----------
+  const resetFilter = () => {
+    if (filterDateRange) {
+      setFilterDateRange([null, null])
+    }
+    setData(dataSource)
+  }
+
+  //----------
+  //  Table Configuration
+  //----------
   const columnss = [
     {
       title: 'Sr. No',
@@ -287,7 +400,7 @@ const AllMemberList = () => {
       dataIndex: 'user_id',
       sorter: {
         compare: (a, b) => a.user_id.localeCompare(b.user_id),
-        multiple: 2,
+        multiple: 2
       },
       render: (_, object, index) => (
         <Link href='javascript:void(0)' onClick={() => setAccessToken(object.user_id)}>
@@ -360,14 +473,14 @@ const AllMemberList = () => {
       dataIndex: 'username',
       sorter: {
         compare: (a, b) => a.username.localeCompare(b.username),
-        multiple: 2,
-      },
+        multiple: 2
+      }
     },
     {
       title: 'User Name',
       sorter: {
         compare: (a, b) => a.first_name.localeCompare(b.first_name),
-        multiple: 2,
+        multiple: 2
       },
       render: (_, object, index) => (
         <Typography>
@@ -382,7 +495,7 @@ const AllMemberList = () => {
       title: 'Package Name(Amount)',
       sorter: {
         compare: (a, b) => a.package.name.localeCompare(b.package.name),
-        multiple: 2,
+        multiple: 2
       },
       render: (_, object, index) => object.package.name + ' ' + object.package.amount
     },
@@ -390,15 +503,15 @@ const AllMemberList = () => {
       title: 'Sponsor Id',
       sorter: {
         compare: (a, b) => a.sponsor?.username.localeCompare(b.sponsor?.username),
-        multiple: 2,
+        multiple: 2
       },
       render: (_, object, index) => object.sponsor?.username
     },
     {
       title: 'Purchase (SAR)',
       sorter: {
-        compare: (a, b) => a.selfIncome-b.selfIncome,
-        multiple: 2,
+        compare: (a, b) => a.selfIncome - b.selfIncome,
+        multiple: 2
       },
       dataIndex: 'selfIncome'
     },
@@ -406,7 +519,7 @@ const AllMemberList = () => {
       title: 'Country',
       sorter: {
         compare: (a, b) => a.country.localeCompare(b.country.username),
-        multiple: 2,
+        multiple: 2
       },
       dataIndex: 'country'
     },
@@ -464,79 +577,19 @@ const AllMemberList = () => {
       )
     }
   ]
-  const sorter = ['ascend', 'descend'];
-  const updateMember = () => {
-    setOpen(true)
-    axios
-      .put(
-        `${process.env.NEXT_PUBLIC_API_URL}/controlpanel/member/update/${memberId}`,
-        {
-          action: 'update-profile',
-          first_name: editUser.first_name,
-          last_name: editUser.last_name,
-          username: editUser.username,
-          email: editUser.email,
-          address: editUser.address,
-          country: editUser.country,
-          phonecode: editUser.phonecode,
-          telephone: editUser.telephone,
-          state: editUser.state,
-          city: editUser.city,
-          dob: editUser.dob ? new Date().toISOString(editUser.dob).split('T')[0] : null,
-          sex: editUser.sex
-          // "password": "12345678",
-          // "t_code" : "12345678"
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.accessToken}`
-          }
-        }
-      )
-      .then(response => {
-        setOpen(false)
-        toast.success(response.data.message)
-        setEditModalOpen(false)
-      })
-      .catch(error => {
-        setOpen(false)
-        toast.error(
-          `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
-        )
-        if (error.response && error.response.status == 401) {
-          auth.logout()
-        }
-      })
-  }
 
-  const applyFilter = () => {
-    console.log(filterDateRange, filterMobile, filterUserId, filterUserName)
-    let dateFrom = filterDateRange[0]['$d'].toLocaleDateString()
-    let dateTo = filterDateRange[1]['$d'].toLocaleDateString()
-    // let filter = dataSource.filter(d => (( filterUserId && d.user_id == filterUserId ) || ( filterUserName && d.username == filterUserName) || (new Date(d.registration_date) >= new Date(dateFrom) && new Date(d.registration_date) <= new Date(dateTo) )))
-    let filter = dataSource.filter(d =>  (new Date(d.registration_date) >= new Date(dateFrom) && new Date(d.registration_date) <= new Date(dateTo) ))
-    setData(filter)
-  }
-
-  const resetFilter = () => {
-    if(filterDateRange){
-      setFilterDateRange([null, null])
-    }
-    setData(dataSource)
-  }
+  //----------
+  //  JSX
+  //----------
   return (
     <>
-      
       <Grid item xs={12}>
-        <Box sx={{display:'flex',my: 8,mt:0,justifyContent:'space-between' }}>
-  
-          <Typography variant='h5' >
-            REGISTERED MEMBER LIST    
-          </Typography>
+        <Box sx={{ display: 'flex', my: 8, mt: 0, justifyContent: 'space-between' }}>
+          <Typography variant='h5'>REGISTERED MEMBER LIST</Typography>
           <Button variant='outlined' onClick={exportFile}>
-        Export in Excel
-        <a hidden></a>
-      </Button>
+            Export in Excel
+            <a hidden></a>
+          </Button>
         </Box>
       </Grid>
       <Backdrop sx={{ color: '#fff', zIndex: 1000000 }} open={open}>
@@ -545,43 +598,49 @@ const AllMemberList = () => {
 
       <Card component='div' sx={{ position: 'relative', mb: 7 }}>
         <CardContent sx={{ overflow: 'auto' }}>
-          <Grid container spacing={2} sx={{mb:5,display:'flex',alignItems:'center'}}>
-            <Grid id="datepicker-list"   item md={3  } xs={12} sx={{ display:'flex'}}>
-          
-            <LocalizationProvider dateAdapter={AdapterDayjs} sx={{height: auto,mb:2}}>
-                  <DateRangePicker  calendars={2} value={filterDateRange} onChange={(newValue) => setFilterDateRange(newValue)}  />
+          <Grid container spacing={2} sx={{ mb: 5, display: 'flex', alignItems: 'center' }}>
+            <Grid id='datepicker-list' item md={3} xs={12} sx={{ display: 'flex' }}>
+              <LocalizationProvider dateAdapter={AdapterDayjs} sx={{ height: auto, mb: 2 }}>
+                <DateRangePicker
+                  calendars={2}
+                  value={filterDateRange}
+                  onChange={newValue => setFilterDateRange(newValue)}
+                />
               </LocalizationProvider>
-           
-            
-            
             </Grid>
-            <Grid item md={2} xs={12} sx={{display: 'flex',alignItems: 'center',}}>
-              <Button variant='contained' sx={{ mr:1}} onClick={applyFilter} disabled={!filterDateRange[0] || !filterDateRange[1] ? true : false} size="small">
+            <Grid item md={2} xs={12} sx={{ display: 'flex', alignItems: 'center' }}>
+              <Button
+                variant='contained'
+                sx={{ mr: 1 }}
+                onClick={applyFilter}
+                disabled={!filterDateRange[0] || !filterDateRange[1] ? true : false}
+                size='small'
+              >
                 <FilterAltIcon />
               </Button>
-        
-              <Button variant='contained'  onClick={resetFilter} color="error" size="small">
-              <FilterAltOffIcon />
+
+              <Button variant='contained' onClick={resetFilter} color='error' size='small'>
+                <FilterAltOffIcon />
               </Button>
             </Grid>
-           
-            <Grid item md={7} xs={12} sx={{display:'flex',justifyContent:'end',alignItems:'center' }}>
+
+            <Grid item md={7} xs={12} sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
               <Input.Search
                 placeholder='Search here.....'
-                style={{ maxWidth: 300, marginBottom: 8, display: 'block',  float: 'right',border:'black' }}
+                style={{ maxWidth: 300, marginBottom: 8, display: 'block', float: 'right', border: 'black' }}
                 onSearch={value => {
                   setSearchedText(value)
                 }}
-                onChange={  e => {
+                onChange={e => {
                   setSearchedText(e.target.value)
-                } }
+                }}
               />
             </Grid>
           </Grid>
           <Table
             columns={columnss}
             dataSource={data}
-            loading={tableLoading}
+            loading={false}
             sortDirections={sorter}
             pagination={
               data?.length > 10

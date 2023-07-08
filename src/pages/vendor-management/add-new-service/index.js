@@ -1,69 +1,98 @@
-import TextField from '@mui/material/TextField'
-import Grid from '@mui/material/Grid'
-import Button from '@mui/material/Button'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import { DataGrid } from '@mui/x-data-grid'
-import Card from '@mui/material/Card'
+//----------
+//  React Imports
+//----------
 import { useEffect, useRef, useState } from 'react'
-import axios from 'axios'
-import { useAuth } from 'src/hooks/useAuth'
-import CardContent from '@mui/material/CardContent'
-import Icon from 'src/@core/components/icon'
-import { toast } from 'react-hot-toast'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogContentText from '@mui/material/DialogContentText'
-import DialogTitle from '@mui/material/DialogTitle'
-import Backdrop from '@mui/material/Backdrop'
-import CircularProgress from '@mui/material/CircularProgress'
-import { Table, Input } from 'antd'
 
+//----------
+// MUI Imports
+//----------
+import {
+  Grid,
+  Button, Typography,
+  Card,
+  CardContent,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Backdrop,
+  CircularProgress
+} from '@mui/material'
+
+//----------
+// Other library Imports
+//----------
+import { toast } from 'react-hot-toast'
+import { Table, Input } from 'antd'
+import axios from 'axios'
+
+//----------
+// Local Imports
+//----------
+import { useAuth } from 'src/hooks/useAuth'
+
+//----------
+//  Constants
+//----------
+const sorter = ['ascend', 'descend']
+const scroll = 'paper'
 
 const AddNewService = () => {
-  const auth = useAuth()
+  //----------
+  //  States
+  //----------
   const [data, setData] = useState([])
   const [open, setOpen] = useState(false)
-  const [editModalOpen, setEditModalOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [scroll, setScroll] = useState('paper')
   const [service, setService] = useState(null)
   const [id, setId] = useState(null)
-  const [tableLoading, setTableLoading] = useState(false)
-  const sorter = ['ascend', 'descend'];
   const [pagination, setPagination] = useState({
     pageSize: 10, // Initial page size
     current: 1 // Initial current page
   })
   const [searchedText, setSearchedText] = useState('')
-  const loadData = () => {
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/vendor/services`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.accessToken}`
-        }
-      })
-      .then(response => {
-        const tempData = response.data.map((d, key) => {
-          return { key, ...d }
-        })
-        setData(tempData)
-      })
-      .catch(error => {
-        toast.error(
-          `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
-        )
-        if (error.response && error.response.status == 401) {
-          auth.logout()
-        }
-      })
-  }
+
+  //----------
+  //  Hooks
+  //----------
+  const auth = useAuth()
+
+  //----------
+  //  Refs
+  //----------
+  const descriptionElementRef = useRef(null)
+
+  //----------
+  //  Effects
+  //----------
   useEffect(() => {
+    const loadData = () => {
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/vendor/services`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.accessToken}`
+          }
+        })
+        .then(response => {
+          const tempData = response.data.map((d, key) => {
+            return { key, ...d }
+          })
+          setData(tempData)
+        })
+        .catch(error => {
+          toast.error(
+            `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
+          )
+          if (error.response && error.response.status == 401) {
+            auth.logout()
+          }
+        })
+    }
+
     loadData()
   }, [])
 
-  const descriptionElementRef = useRef(null)
   useEffect(() => {
     if (open) {
       const { current: descriptionElement } = descriptionElementRef
@@ -72,13 +101,25 @@ const AddNewService = () => {
       }
     }
   }, [open])
+
+  //----------
+  //  Actions - Delete Service Alert
+  //----------
   const deleteServiceAlert = id => {
     setId(id)
     setDeleteModalOpen(true)
   }
+
+  //----------
+  //  Actions - Close Delete Modal
+  //----------
   const handleClose = () => {
     setDeleteModalOpen(false)
   }
+
+  //----------
+  //  Actions - Delete Service
+  //----------
   const deleteService = () => {
     if (id) {
       setOpen(true)
@@ -125,6 +166,9 @@ const AddNewService = () => {
     }
   }
 
+  //----------
+  //  Actions - Create Service
+  //----------
   const createService = () => {
     if (service) {
       setOpen(true)
@@ -176,6 +220,10 @@ const AddNewService = () => {
       toast.error('Service field is required')
     }
   }
+
+  //----------
+  //  Table Configuration
+  //----------
   const columns = [
     {
       title: 'Sr. No',
@@ -186,7 +234,7 @@ const AddNewService = () => {
       dataIndex: 'service_name',
       sorter: {
         compare: (a, b) => a.service_name.localeCompare(b.service_name),
-        multiple: 2,
+        multiple: 2
       },
       filteredValue: [searchedText],
       onFilter: (value, record) => {
@@ -200,16 +248,16 @@ const AddNewService = () => {
             .replace(' ', '')
             .toLowerCase()
             .trim()
-            .includes(value.replace(' ', '').toLowerCase().trim()) 
+            .includes(value.replace(' ', '').toLowerCase().trim())
         )
+      }
     },
-  },
     {
       title: 'Date',
       dataIndex: 'date',
       sorter: {
         compare: (a, b) => a.service_name.localeCompare(b.service_name),
-        multiple: 2,
+        multiple: 2
       },
       render: (text, record) => new Date(record.date).toLocaleDateString()
     },
@@ -228,9 +276,12 @@ const AddNewService = () => {
           </Button>
         </>
       )
-    },
-    
+    }
   ]
+
+  //----------
+  //  JSX
+  //----------
   return (
     <>
       <Grid container spacing={3}>
@@ -254,41 +305,47 @@ const AddNewService = () => {
           </Button>
         </Grid>
         <Grid item xs={12}>
-        <Card component='div' sx={{ position: 'relative', mt: 20 }}>
+          <Card component='div' sx={{ position: 'relative', mt: 20 }}>
             <CardContent>
-            <Input.Search
-            placeholder='Search here.....'
-            style={{ maxWidth: 300, marginBottom: 8, display: 'block', height: 50, float: 'right', border: 'black' }}
-            onSearch={value => {
-              setSearchedText(value)
-            }}
-            onChange={e => {
-              setSearchedText(e.target.value)
-            }}
-          />
-          <Table
-            columns={columns}
-            dataSource={data}
-            loading={tableLoading}
-            sortDirections={sorter}
-            pagination={
-              data?.length > 10
-                ? {
-                    defaultCurrent: 1,
-                    total: data?.length,
-                    defaultPageSize: 10,
-                    showSizeChanger: true,
-                    showTotal: (total, range) => `Total: ${total}`,
-                    pageSizeOptions: ['10', '25', '50', '100'],
-                    locale: { items_per_page: '' }
-                  }
-                : false   
-            }
-            onChange={pagination => setPagination(pagination)}
-          />
+              <Input.Search
+                placeholder='Search here.....'
+                style={{
+                  maxWidth: 300,
+                  marginBottom: 8,
+                  display: 'block',
+                  height: 50,
+                  float: 'right',
+                  border: 'black'
+                }}
+                onSearch={value => {
+                  setSearchedText(value)
+                }}
+                onChange={e => {
+                  setSearchedText(e.target.value)
+                }}
+              />
+              <Table
+                columns={columns}
+                dataSource={data}
+                loading={false}
+                sortDirections={sorter}
+                pagination={
+                  data?.length > 10
+                    ? {
+                        defaultCurrent: 1,
+                        total: data?.length,
+                        defaultPageSize: 10,
+                        showSizeChanger: true,
+                        showTotal: (total, range) => `Total: ${total}`,
+                        pageSizeOptions: ['10', '25', '50', '100'],
+                        locale: { items_per_page: '' }
+                      }
+                    : false
+                }
+                onChange={pagination => setPagination(pagination)}
+              />
             </CardContent>
           </Card>
-          
         </Grid>
       </Grid>
 

@@ -1,86 +1,102 @@
-// ** MUI Imports
-import Grid from '@mui/material/Grid'
-import { divide } from 'lodash'
-import Container from '@mui/material/Container'
-import Box from '@mui/material/Box'
-import Avatar from '@mui/material/Avatar'
-import Welcome from 'src/views/dashboard/Welcome'
-import Card from '@mui/material/Card'
-import { styled } from '@mui/material/styles'
-import Typography from '@mui/material/Typography'
-import CardContent from '@mui/material/CardContent'
-import Highcharts from 'highcharts'
-import HighchartsReact from 'highcharts-react-official'
-import { useAuth } from 'src/hooks/useAuth'
-import { ComposableMap, Geographies, Geography } from 'react-simple-maps'
-// by nabeel
+//----------
+//  React Imports
+//----------
 import { useEffect, useState } from 'react'
-import axios from 'axios'
+
+//----------
+// MUI Imports
+//----------
+import { Grid, Avatar, Card, Typography, CardContent } from '@mui/material'
+
+//----------
+// Other library Imports
+//----------
+import { ComposableMap, Geographies, Geography } from 'react-simple-maps'
 import { toast } from 'react-hot-toast'
+import Highcharts from 'highcharts'
+import axios from 'axios'
 
-// end
-const Dashboard = () => {
-  const geoUrl = 'https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json'
-  const options = {
-    title: {
-      text: 'Total Members chart'
-    },
-    xAxis: {
-      title:'dd',
-      categories: [
-        'January',
-        'February',
-        'March',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'April',
-        'November',
-        'Decemeber'
-      ]
-    },
-    series: [
-      {
-        data: [10, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      }
+//----------
+// Local Imports
+//----------
+import { useAuth } from 'src/hooks/useAuth'
+
+//----------
+// Constants
+//----------
+const geoUrl = 'https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json'
+const options = {
+  title: {
+    text: 'Total Members chart'
+  },
+  xAxis: {
+    title: 'dd',
+    categories: [
+      'January',
+      'February',
+      'March',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'April',
+      'November',
+      'Decemeber'
     ]
-  }
-  const auth = useAuth()
+  },
+  series: [
+    {
+      data: [10, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    }
+  ]
+}
 
+const Dashboard = () => {
+  //----------
+  //  States
+  //----------
   const [categories, setCategories] = useState([])
   const [data, setData] = useState([])
   const [row, setRow] = useState([])
 
-  // by nabeel
-  let loadData = () => {
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.accessToken}`
-        }
-      })
-      .then(response => {
-        setCategories(Object.keys(response.data.graph[0].members))
-        setRow(Object.values(response.data.graph[0].members))
-        setData(response.data)
-      })
-      .catch(error => {
-        toast.error(
-          `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
-        )
-        if (error.response && error.response.status == 401) {
-          auth.logout()
-        }
-      })
-  }
+  //----------
+  //  Hooks
+  //----------
+  const auth = useAuth()
 
+  //----------
+  //  Effects
+  //----------
   useEffect(() => {
+    const loadData = () => {
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.accessToken}`
+          }
+        })
+        .then(response => {
+          setCategories(Object.keys(response.data.graph[0].members))
+          setRow(Object.values(response.data.graph[0].members))
+          setData(response.data)
+        })
+        .catch(error => {
+          toast.error(
+            `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
+          )
+          if (error.response && error.response.status == 401) {
+            auth.logout()
+          }
+        })
+    }
     loadData()
   }, [])
-  // end
+
+  //----------
+  //  JSX
+  //----------
   return (
     <div>
       <Card component='div' sx={{ position: 'relative', mb: 7 }}>
@@ -308,18 +324,18 @@ const Dashboard = () => {
                 highcharts={Highcharts}
                 options={{
                   ...options,
-                  xAxis: {     title:'dd', categories },
-                  series: [{ data:row }]
+                  xAxis: { title: 'dd', categories },
+                  series: [{ data: row }]
                 }}
               />
             </CardContent>
-          </Card>  
+          </Card>
         </Grid>
         <Grid item xs={12}>
           <Card component='div' sx={{ position: 'relative', mb: 7 }}>
             <CardContent>
               <HighchartsReact
-                highcharts={Highcharts} 
+                highcharts={Highcharts}
                 constructorType={'mapChart'}
                 allowChartUpdate={true}
                 immutable={false}
@@ -332,7 +348,7 @@ const Dashboard = () => {
         <Grid item xs={12}>
           <Card component='div' sx={{ position: 'relative', mb: 7 }}>
             <CardContent>
-              <ComposableMap fill="darkslategray" stroke="gray" strokeWidth="0.1px" projectionConfig={{ scale: 140 }}>
+              <ComposableMap fill='darkslategray' stroke='gray' strokeWidth='0.1px' projectionConfig={{ scale: 140 }}>
                 <Geographies geography={geoUrl}>
                   {({ geographies }) => geographies.map(geo => <Geography key={geo.rsmKey} geography={geo} />)}
                 </Geographies>

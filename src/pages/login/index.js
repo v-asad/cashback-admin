@@ -1,65 +1,46 @@
-// ** React Imports
-import { useEffect, useState } from 'react'
+//----------
+//  React Imports
+//----------
+import { useState } from 'react'
 
-// ** MUI Components
-import Button from '@mui/material/Button'
-import TextField from '@mui/material/TextField'
-import InputLabel from '@mui/material/InputLabel'
-import IconButton from '@mui/material/IconButton'
-import Box from '@mui/material/Box'
-import FormControl from '@mui/material/FormControl'
-import useMediaQuery from '@mui/material/useMediaQuery'
-import OutlinedInput from '@mui/material/OutlinedInput'
+//----------
+// MUI Imports
+//----------
+import {
+  Button,
+  Box,
+  Typography,
+  Card,
+  InputLabel,
+  IconButton,
+  TextField,
+  FormControl,
+  useMediaQuery,
+  OutlinedInput,
+  FormHelperText,
+  InputAdornment,
+  Divider
+} from '@mui/material'
 import { styled, useTheme } from '@mui/material/styles'
-import FormHelperText from '@mui/material/FormHelperText'
-import InputAdornment from '@mui/material/InputAdornment'
-import Typography from '@mui/material/Typography'
-import MuiFormControlLabel from '@mui/material/FormControlLabel'
-import Card from '@mui/material/Card'
-// ** Icon Imports
-import Icon from 'src/@core/components/icon'
-    
-// ** Third Party Imports
-import * as yup from 'yup'
+
+//----------
+// Other library Imports
+//----------
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-
-// ** Hooks
-import { useAuth } from 'src/hooks/useAuth'
-import { useSettings } from 'src/@core/hooks/useSettings'
-
-// ** Configs
-import themeConfig from 'src/configs/themeConfig'
-
-// ** Layout Import
-import BlankLayout from 'src/@core/layouts/BlankLayout'
-
-// ** Demo Imports
-import FooterIllustrationsV2 from 'src/views/login/FooterIllustrationsV2'
-
-import RoleSelect from 'src/views/login/RoleSelect'
-import { Divider } from '@mui/material'
 import { toast } from 'react-hot-toast'
+import * as yup from 'yup'
 
-// ** Styled Components
-const LoginIllustrationWrapper = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(20),
-  paddingRight: '0 !important',
-  [theme.breakpoints.down('lg')]: {
-    padding: theme.spacing(10)
-  }
-}))
+//----------
+// Local Imports
+//----------
+import BlankLayout from 'src/@core/layouts/BlankLayout'
+import Icon from 'src/@core/components/icon'
+import { useAuth } from 'src/hooks/useAuth'
 
-const LoginIllustration = styled('img')(({ theme }) => ({
-  maxWidth: '48rem',
-  [theme.breakpoints.down('xl')]: {
-    maxWidth: '38rem'
-  },
-  [theme.breakpoints.down('lg')]: {
-    maxWidth: '30rem'
-  }
-}))
-
+//----------
+// Styled Components
+//----------
 const RightWrapper = styled(Box)(({ theme }) => ({
   width: '100%',
   [theme.breakpoints.up('md')]: {
@@ -84,40 +65,42 @@ const TypographyStyled = styled(Typography)(({ theme }) => ({
   [theme.breakpoints.down('md')]: { marginTop: theme.spacing(8) }
 }))
 
-const FormControlLabel = styled(MuiFormControlLabel)(({ theme }) => ({
-  '& .MuiFormControlLabel-label': {
-    fontSize: '0.875rem',
-    color: theme.palette.text.secondary
-  }
-}))
-
+//----------
+// Yup Schemas
+//----------
 const schema = yup.object().shape({
   username: yup.string().min(3).required(),
   password: yup.string().min(5).required()
 })
 
+//----------
+//  Constants
+//----------
 const defaultValues = {
   password: '',
   username: ''
 }
 
 const LoginPage = () => {
+  //----------
+  //  States
+  //----------
   const [showPassword, setShowPassword] = useState(false)
   const [role, setRole] = useState(null)
   const [isSubmitting, setSubmitting] = useState(false)
 
-  // ** Hooks
+  //----------
+  //  Hooks
+  //----------
   const auth = useAuth()
   const theme = useTheme()
-  const { settings } = useSettings()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
 
-  // ** Vars
-  const { skin } = settings
-
+  //----------
+  //  Hook Form
+  //----------
   const {
     control,
-    setError,
     handleSubmit,
     formState: { errors }
   } = useForm({
@@ -126,6 +109,9 @@ const LoginPage = () => {
     resolver: yupResolver(schema)
   })
 
+  //----------
+  //  Handlers
+  //----------
   const onSubmit = data => {
     setSubmitting(true)
 
@@ -137,11 +123,12 @@ const LoginPage = () => {
       else message.map(msg => toast.error(msg))
     })
   }
-  const imageSource = skin === 'bordered' ? 'create-deal-review-complete' : 'create-deal-review-complete'
 
+  //----------
+  //  JSX
+  //----------
   return (
     <Box sx={{ overflow: 'auto' }} className='content-center cloudbg'>
-    
       <RightWrapper sx={skin === 'bordered' && !hidden ? { borderLeft: `1px solid ${theme.palette.divider}` } : {}}>
         <Card
           sx={{
@@ -154,18 +141,17 @@ const LoginPage = () => {
           }}
         >
           <BoxWrapper>
-           
             <Box sx={{ mb: 6 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                my: 6
-              }}
-            >
-              <img src='/images/logo.png' style={{ width: 150, objectFit: 'cover' }} />
-            </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  my: 6
+                }}
+              >
+                <img src='/images/logo.png' style={{ width: 150, objectFit: 'cover' }} />
+              </Box>
               <TypographyStyled variant='h5'>{`Welcome to Uplines admin dashboard`}</TypographyStyled>
               <Typography variant='body2'>Please sign-in to your account and start the adventure</Typography>
             </Box>
@@ -183,7 +169,8 @@ const LoginPage = () => {
                       label='Username'
                       value={value}
                       onBlur={onBlur}
-                      onChange={onChange} n 
+                      onChange={onChange}
+                      n
                       error={Boolean(errors.username)}
                       placeholder='username'
                     />
@@ -240,6 +227,7 @@ const LoginPage = () => {
     </Box>
   )
 }
+
 LoginPage.getLayout = page => <BlankLayout>{page}</BlankLayout>
 LoginPage.guestGuard = true
 

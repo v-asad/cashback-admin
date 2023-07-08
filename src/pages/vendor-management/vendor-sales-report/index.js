@@ -1,43 +1,68 @@
-import TextField from '@mui/material/TextField'
-import Grid from '@mui/material/Grid'
-import Button from '@mui/material/Button'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import { DataGrid } from '@mui/x-data-grid'
-import Card from '@mui/material/Card'
+//----------
+//  React Imports
+//----------
 import { useEffect, useRef, useState } from 'react'
-import axios from 'axios'
-import { useAuth } from 'src/hooks/useAuth'
-import CardContent from '@mui/material/CardContent'
-import Icon from 'src/@core/components/icon'
-import { toast } from 'react-hot-toast'
-import Link from '@mui/material/Link'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogContentText from '@mui/material/DialogContentText'
-import DialogTitle from '@mui/material/DialogTitle'
-import Backdrop from '@mui/material/Backdrop'
-import CircularProgress from '@mui/material/CircularProgress'
-import Paper from '@mui/material/Paper'
-import { Table, Input } from 'antd'
 
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
-import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
-import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
+//----------
+// MUI Imports
+//----------
+import {
+  Grid,
+  Button,
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Link,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Backdrop,
+  CircularProgress,
+  Paper,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow
+} from '@mui/material'
+import { LocalizationProvider } from '@mui/x-date-pickers-pro'
+import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker'
+import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs'
+
+//----------
+// MUI Icon Imports
+//----------
+import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
+import FilterAltIcon from '@mui/icons-material/FilterAlt'
+
+//----------
+// Other library Imports
+//----------
+import { toast } from 'react-hot-toast'
+import { Table, Input } from 'antd'
+import axios from 'axios'
+
+//----------
+// Local Imports
+//----------
+import { useAuth } from 'src/hooks/useAuth'
+
+//----------
+//  Constants
+//----------
+const sorter = ['ascend', 'descend']
+const scroll = 'paper'
+
 const VendorSalesReport = () => {
-  const auth = useAuth()
+  //----------
+  //  States
+  //----------
   const [data, setData] = useState([])
   const [dataSource, setDataSource] = useState([])
   const [open, setOpen] = useState(false)
-  const [scroll, setScroll] = useState('paper')
   const [detailsModalOpen, setDetailsModalOpen] = useState(false)
   const [detailedData, setDetailedData] = useState([])
   const [invoiceNo, setInvoiceNo] = useState(null)
@@ -47,13 +72,20 @@ const VendorSalesReport = () => {
   const [totalCommision, setTotalCommision] = useState(0)
   const [filterDateRange, setFilterDateRange] = useState([null, null])
   const descriptionElementRef = useRef(null)
-  const [tableLoading, setTableLoading] = useState(false)
-  const sorter = ['ascend', 'descend']
   const [pagination, setPagination] = useState({
     pageSize: 10, // Initial page size
     current: 1 // Initial current page
   })
   const [searchedText, setSearchedText] = useState('')
+
+  //----------
+  //  Hooks
+  //----------
+  const auth = useAuth()
+
+  //----------
+  //  Effects
+  //----------
   useEffect(() => {
     if (open) {
       const { current: descriptionElement } = descriptionElementRef
@@ -63,47 +95,51 @@ const VendorSalesReport = () => {
     }
   }, [open])
 
-  const handleClose = () => {
-    setDetailsModalOpen(false)
-  }
-  const handleInvoiceClose = () => {
-    setEditModalOpen(false)
-  }
-  const loadData = () => {
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/vendor/sales-report`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.accessToken}`
-        }
-      })
-      .then(response => {
-        const tempData = response.data.data.map((d, key) => {
-          return { key, ...d }
-        })
-        setData(tempData)
-        setDataSource(tempData)
-        setData(tempData)
-        let total = 0
-        let commision = 0
-        tempData.forEach(d => {
-          commision += parseFloat(d.commision)
-          total += parseFloat(d.invoice_amount)
-        })
-        setTotalSale(total)
-        setTotalCommision(commision)
-      })
-      .catch(error => {
-        toast.error(
-          `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
-        )
-        if (error.response && error.response.status == 401) {
-          auth.logout()
-        }
-      })
-  }
   useEffect(() => {
+    const loadData = () => {
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/vendor/sales-report`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.accessToken}`
+          }
+        })
+        .then(response => {
+          const tempData = response.data.data.map((d, key) => {
+            return { key, ...d }
+          })
+          setData(tempData)
+          setDataSource(tempData)
+          setData(tempData)
+          let total = 0
+          let commision = 0
+          tempData.forEach(d => {
+            commision += parseFloat(d.commision)
+            total += parseFloat(d.invoice_amount)
+          })
+          setTotalSale(total)
+          setTotalCommision(commision)
+        })
+        .catch(error => {
+          toast.error(
+            `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
+          )
+          if (error.response && error.response.status == 401) {
+            auth.logout()
+          }
+        })
+    }
     loadData()
   }, [])
+
+  //----------
+  //  Handlers
+  //----------
+  const handleClose = () => setDetailsModalOpen(false)
+  const handleInvoiceClose = () => setEditModalOpen(false)
+
+  //----------
+  //  Actions - View Invoice No
+  //----------
   const viewInvoiceNo = inv => {
     setInvoiceNo(inv)
     setOpen(true)
@@ -127,6 +163,10 @@ const VendorSalesReport = () => {
         }
       })
   }
+
+  //----------
+  //  Actions - View Invoice
+  //----------
   const viewInvoice = vendor_id => {
     setOpen(true)
     axios
@@ -153,6 +193,48 @@ const VendorSalesReport = () => {
         }
       })
   }
+
+  //----------
+  //  Actions - Apply Filter
+  //----------
+  const applyFilter = () => {
+    let dateFrom = filterDateRange[0]['$d'].toLocaleDateString()
+    let dateTo = filterDateRange[1]['$d'].toLocaleDateString()
+    let filter = dataSource.filter(
+      d => new Date(d.receive_date) >= new Date(dateFrom) && new Date(d.receive_date) <= new Date(dateTo)
+    )
+    setData(filter)
+    let total = 0
+    let commision = 0
+    filter.forEach(d => {
+      commision += parseFloat(d.commision)
+      total += parseFloat(d.invoice_amount)
+    })
+    setTotalSale(total)
+    setTotalCommision(commision)
+  }
+
+  //----------
+  //  Actions - Reset Filter
+  //----------
+  const resetFilter = () => {
+    if (filterDateRange) {
+      setFilterDateRange([null, null])
+    }
+    setData(dataSource)
+    let total = 0
+    let commision = 0
+    dataSource.forEach(d => {
+      commision += parseFloat(d.commision)
+      total += parseFloat(d.invoice_amount)
+    })
+    setTotalSale(total)
+    setTotalCommision(commision)
+  }
+
+  //----------
+  //  Table Configurations
+  //----------
   const columns = [
     {
       title: 'Sr. No',
@@ -202,8 +284,8 @@ const VendorSalesReport = () => {
             .replace(' ', '')
             .toLowerCase()
             .trim()
-            .includes(value.replace(' ', '').toLowerCase().trim())||
-            String(record.receive_date)
+            .includes(value.replace(' ', '').toLowerCase().trim()) ||
+          String(record.receive_date)
             .replace(' ', '')
             .toLowerCase()
             .trim()
@@ -271,7 +353,6 @@ const VendorSalesReport = () => {
       )
     }
   ]
-
   const detailedColumn = [
     {
       title: 'Sr. No',
@@ -321,8 +402,8 @@ const VendorSalesReport = () => {
             .replace(' ', '')
             .toLowerCase()
             .trim()
-            .includes(value.replace(' ', '').toLowerCase().trim())||
-            String(record.receive_date)
+            .includes(value.replace(' ', '').toLowerCase().trim()) ||
+          String(record.receive_date)
             .replace(' ', '')
             .toLowerCase()
             .trim()
@@ -366,7 +447,7 @@ const VendorSalesReport = () => {
       title: 'Commission ',
       dataIndex: 'commision',
       sorter: {
-        compare: (a, b) => a.commision.localeCompare(b.commision),       
+        compare: (a, b) => a.commision.localeCompare(b.commision),
         multiple: 2
       }
     },
@@ -376,10 +457,10 @@ const VendorSalesReport = () => {
       render: (_, object, index) => (
         <>
           <Link href='javascript:void(0)' onClick={() => viewInvoiceNo(object.invoice)}>
-          {object.invoice}
-        </Link>
+            {object.invoice}
+          </Link>
         </>
-      )   
+      )
     },
     {
       title: 'Receive Date',
@@ -389,40 +470,12 @@ const VendorSalesReport = () => {
         multiple: 2
       },
       render: (text, record) => new Date(record.receive_date).toLocaleDateString()
-    },
-   
-  
+    }
   ]
 
-  const applyFilter = () => {
-    let dateFrom = filterDateRange[0]['$d'].toLocaleDateString()
-    let dateTo = filterDateRange[1]['$d'].toLocaleDateString()
-    let filter = dataSource.filter(d =>  (new Date(d.receive_date) >= new Date(dateFrom) && new Date(d.receive_date) <= new Date(dateTo) ))
-    setData(filter)
-    let total = 0
-    let commision = 0
-    filter.forEach(d => {
-      commision += parseFloat(d.commision)
-      total += parseFloat(d.invoice_amount)
-    })
-    setTotalSale(total)
-    setTotalCommision(commision)
-  }
-
-  const resetFilter = () => {
-    if(filterDateRange){
-      setFilterDateRange([null, null])
-    }
-    setData(dataSource)
-    let total = 0
-    let commision = 0
-    dataSource.forEach(d => {
-      commision += parseFloat(d.commision)
-      total += parseFloat(d.invoice_amount)
-    })
-    setTotalSale(total)
-    setTotalCommision(commision)
-  }
+  //----------
+  //  JSX
+  //----------
   return (
     <>
       <Grid item xs={12}>
@@ -439,42 +492,59 @@ const VendorSalesReport = () => {
               <Grid container spacing={3}>
                 <Grid item md={5} xs={4}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DateRangePicker calendars={2} value={filterDateRange} onChange={(newValue) => setFilterDateRange(newValue)} />
+                    <DateRangePicker
+                      calendars={2}
+                      value={filterDateRange}
+                      onChange={newValue => setFilterDateRange(newValue)}
+                    />
                   </LocalizationProvider>
                 </Grid>
-              
+
                 <Grid item md={1} xs={2}>
-                  <Button variant='contained' sx={{ mr: 2, mt: 2}} onClick={applyFilter} disabled={!filterDateRange[0] || !filterDateRange[1] ? true : false} size="small">
+                  <Button
+                    variant='contained'
+                    sx={{ mr: 2, mt: 2 }}
+                    onClick={applyFilter}
+                    disabled={!filterDateRange[0] || !filterDateRange[1] ? true : false}
+                    size='small'
+                  >
                     <FilterAltIcon />
                   </Button>
                 </Grid>
                 <Grid item md={1} xs={2}>
-                  <Button variant='contained' sx={{ mr: 2, mt: 2}} onClick={resetFilter} color="error" size="small">
-                  <FilterAltOffIcon />
+                  <Button variant='contained' sx={{ mr: 2, mt: 2 }} onClick={resetFilter} color='error' size='small'>
+                    <FilterAltOffIcon />
                   </Button>
                 </Grid>
                 <Grid item md={5} xs={8}>
                   <Input.Search
                     placeholder='Search here.....'
-                    style={{ maxWidth: 300, marginBottom: 8, display: 'block', height: 50, float: 'right',border:'black' }}
+                    style={{
+                      maxWidth: 300,
+                      marginBottom: 8,
+                      display: 'block',
+                      height: 50,
+                      float: 'right',
+                      border: 'black'
+                    }}
                     onSearch={value => {
                       setSearchedText(value)
                     }}
-                    onChange={  e => {
+                    onChange={e => {
                       setSearchedText(e.target.value)
-                    } }
+                    }}
                   />
                 </Grid>
               </Grid>
               <Table
                 columns={columns}
                 dataSource={data}
-                loading={tableLoading}
                 sortDirections={sorter}
                 pagination={
                   data?.length > 10
                     ? {
                         defaultCurrent: 1,
+
                         total: data?.length,
                         defaultPageSize: 10,
                         showSizeChanger: true,
@@ -488,10 +558,10 @@ const VendorSalesReport = () => {
               />
             </CardContent>
             <Typography variant='h5' sx={{ my: 1, mx: 10 }}>
-                  Total Sale : {totalSale.toFixed(2)}
+              Total Sale : {totalSale.toFixed(2)}
             </Typography>
             <Typography variant='h5' sx={{ my: 1, mx: 10 }}>
-                  Total Commision : {totalCommision.toFixed(2)}
+              Total Commision : {totalCommision.toFixed(2)}
             </Typography>
           </Card>
         </Grid>
@@ -535,12 +605,12 @@ const VendorSalesReport = () => {
                   <Table
                     columns={detailedColumn}
                     dataSource={data}
-                    loading={tableLoading}
                     sortDirections={sorter}
                     pagination={
                       data?.length > 10
                         ? {
                             defaultCurrent: 1,
+
                             total: data?.length,
                             defaultPageSize: 10,
                             showSizeChanger: true,

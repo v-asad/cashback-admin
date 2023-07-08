@@ -18,12 +18,10 @@ import { defaultACLObj } from 'src/configs/acl'
 import themeConfig from 'src/configs/themeConfig'
 // Set application language
 if (typeof window !== 'undefined') {
-  let setLang = localStorage.localization||process.env.NEXT_PUBLIC_LANG
+  let setLang = localStorage.localization || process.env.NEXT_PUBLIC_LANG
   console.log(process.env.NEXT_PUBLIC_LANG)
   localStorage.setItem('localization', setLang)
 }
-// ** Fake-DB Import
-// import 'src/@fake-db'
 
 // ** Third Party Import
 import { Toaster } from 'react-hot-toast'
