@@ -57,9 +57,6 @@ import 'prismjs/components/prism-tsx'
 import 'react-perfect-scrollbar/dist/css/styles.css'
 import 'src/iconify-bundle/icons-bundle-react'
 
-// ** React Image Crop
-import 'react-image-crop/dist/ReactCrop.css'
-
 // ** Global css styles
 import '../../styles/globals.css'
 
