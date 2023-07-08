@@ -1,11 +1,15 @@
 //----------
-//  React Imports
+// React Imports
 //----------
+
+// Importing necessary hooks from 'react'
 import { useEffect, useState } from 'react'
 
 //----------
 // MUI Imports
 //----------
+
+// Importing MUI components and styling elements from the '@mui' library
 import { Grid, Button, Box, Typography, Card, CardContent } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers-pro'
 import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker'
@@ -14,12 +18,16 @@ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs'
 //----------
 // MUI Icon Imports
 //----------
+
+// Importing MUI icons from the '@mui/icons-material' library
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff'
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
 
 //----------
 // Other library Imports
 //----------
+
+// Importing necessary libraries and utilities
 import { toast } from 'react-hot-toast'
 import { Table, Input } from 'antd'
 import axios from 'axios'
@@ -27,22 +35,36 @@ import axios from 'axios'
 //----------
 // Local Imports
 //----------
+
+// Importing custom hooks from the 'src/hooks' directory
 import { useAuth } from 'src/hooks/useAuth'
 
 //----------
-//  Constants
+// Constants
 //----------
+
+// Array of sort directions for the table column sorting
 const sorter = ['ascend', 'descend']
+
+//----------
+// AdminRevenueReport Component
+//----------
 
 const AdminRevenueReport = () => {
   //----------
   //  States
   //----------
+
+  // State variable to store the fetched data
   const [data, setData] = useState([])
-  const [totalSale, settotalSale] = useState(0)
-  const [totalCommision, settotalCommision] = useState(0)
-  const [totalPayoutDistribution, settotalPayoutDistribution] = useState(0)
-  const [totalCompanyRevenue, settotalCompanyRevenue] = useState(0)
+
+  // State variables to store and update total sale, commission, payout distribution, and company revenue
+  const [totalSale, setTotalSale] = useState(0)
+  const [totalCommission, setTotalCommission] = useState(0)
+  const [totalPayoutDistribution, setTotalPayoutDistribution] = useState(0)
+  const [totalCompanyRevenue, setTotalCompanyRevenue] = useState(0)
+
+  // State variables for managing data source and filter settings
   const [dataSource, setDataSource] = useState([])
   const [filterDateRange, setFilterDateRange] = useState([null, null])
   const [pagination, setPagination] = useState({
@@ -54,11 +76,15 @@ const AdminRevenueReport = () => {
   //----------
   //  Hooks
   //----------
+
+  // Using custom 'useAuth' hook to access authentication related functionality
   const auth = useAuth()
 
   //----------
   //  Effects
   //----------
+
+  // Fetching revenue report data on component mount
   useEffect(() => {
     const loadData = () => {
       axios
@@ -68,32 +94,43 @@ const AdminRevenueReport = () => {
           }
         })
         .then(response => {
-          settotalSale(response.data.totalSale)
-          settotalCommision(response.data.totalCommision)
-          settotalPayoutDistribution(response.data.totalPayoutDistribution)
-          settotalCompanyRevenue(response.data.totalCompanyRevenue)
+          // Updating state variables with the fetched data
+          setTotalSale(response.data.totalSale)
+          setTotalCommission(response.data.totalCommission)
+          setTotalPayoutDistribution(response.data.totalPayoutDistribution)
+          setTotalCompanyRevenue(response.data.totalCompanyRevenue)
+
+          // Mapping the fetched data and adding a 'key' property to each item
           const tempData = response.data.data.map((d, key) => {
             return { key, ...d }
           })
+
+          // Updating the state variables with the mapped data
           setData(tempData)
           setDataSource(tempData)
         })
         .catch(error => {
+          // Displaying error toast message if API request fails
           toast.error(
             `${error.response ? error.response.status : ''}: ${error.response ? error.response.data.message : error}`
           )
-          if (error.response && error.response.status == 401) {
+
+          // Logging out the user if the API request returns an unauthorized status code (401)
+          if (error.response && error.response.status === 401) {
             auth.logout()
           }
         })
     }
 
+    // Loading data on component mount
     loadData()
   }, [])
 
   //----------
-  //  Table Configuration
+  // Table Configuration
   //----------
+
+  // Configuration for the columns of the table
   const columns = [
     {
       title: 'Sr. No',
@@ -109,6 +146,7 @@ const AdminRevenueReport = () => {
       render: (text, record) => new Date(record.payoutDate).toLocaleDateString(),
       filteredValue: [searchedText],
       onFilter: (value, record) => {
+        // Custom filter function for filtering the table rows based on multiple columns
         return (
           String(record.payoutDate)
             .replace(' ', '')
@@ -173,60 +211,71 @@ const AdminRevenueReport = () => {
   ]
 
   //----------
-  //  Table Actions - Apply Filter
+  // Table Actions - Apply Filter
   //----------
+
+  // Function to apply the selected filter to the table data
   const applyFilter = () => {
     let dateFrom = filterDateRange[0]['$d'].toLocaleDateString()
     let dateTo = filterDateRange[1]['$d'].toLocaleDateString()
+
+    // Filtering the dataSource based on the selected date range
     let filter = dataSource.filter(
       d => new Date(d.payoutDate) >= new Date(dateFrom) && new Date(d.payoutDate) <= new Date(dateTo)
     )
+
+    // Updating the state variables with the filtered data and calculating total values
     setData(filter)
     let totalSale = 0
-    let commision = 0
+    let commission = 0
     let payout = 0
     let revenue = 0
     filter.forEach(d => {
       totalSale += parseFloat(d.totalSaleFromVendor)
-      commision += parseFloat(d.totalCommision)
+      commission += parseFloat(d.totalCommision)
       payout += parseFloat(d.totalPayoutDistribution)
       revenue += parseFloat(d.companyRevenue)
     })
-    settotalSale(totalSale)
-    settotalCommision(commision)
-    settotalPayoutDistribution(payout)
-    settotalCompanyRevenue(revenue)
+    setTotalSale(totalSale)
+    setTotalCommission(commission)
+    setTotalPayoutDistribution(payout)
+    setTotalCompanyRevenue(revenue)
   }
 
   //----------
-  //  Table Actions - Reset Filter
+  // Table Actions - Reset Filter
   //----------
+
+  // Function to reset the applied filter and display the original table data
   const resetFilter = () => {
     if (filterDateRange) {
       setFilterDateRange([null, null])
     }
     setData(dataSource)
     let totalSale = 0
-    let commision = 0
+    let commission = 0
     let payout = 0
     let revenue = 0
     dataSource.forEach(d => {
       totalSale += parseFloat(d.totalSaleFromVendor)
-      commision += parseFloat(d.totalCommision)
+      commission += parseFloat(d.totalCommision)
       payout += parseFloat(d.totalPayoutDistribution)
       revenue += parseFloat(d.companyRevenue)
     })
-    settotalSale(totalSale)
-    settotalCommision(commision)
-    settotalPayoutDistribution(payout)
-    settotalCompanyRevenue(revenue)
+    setTotalSale(totalSale)
+    setTotalCommission(commission)
+    setTotalPayoutDistribution(payout)
+    setTotalCompanyRevenue(revenue)
   }
 
   //----------
-  //  JSX
+  // JSX
   //----------
+
+  // JSX code that defines the structure and layout of the component's UI
   return (
     <>
+      {/* Admin Commission Report Heading */}
       <Grid item xs={12}>
         <Box>
           <Typography variant='h5' sx={{ my: 8 }}>
@@ -236,9 +285,11 @@ const AdminRevenueReport = () => {
       </Grid>
       <Grid container spacing={3}>
         <Grid item xs={12}>
+          {/* Card component for the filter and table */}
           <Card component='div' sx={{ position: 'relative' }}>
             <CardContent>
               <Grid container spacing={3}>
+                {/* DateRangePicker for selecting the filter date range */}
                 <Grid item md={5} xs={4}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DateRangePicker
@@ -249,22 +300,27 @@ const AdminRevenueReport = () => {
                   </LocalizationProvider>
                 </Grid>
 
+                {/* Apply Filter Button */}
                 <Grid item md={1} xs={2}>
                   <Button
                     variant='contained'
                     sx={{ mr: 2, mt: 2 }}
                     onClick={applyFilter}
-                    disabled={!filterDateRange[0] || !filterDateRange[1] ? true : false}
+                    disabled={!filterDateRange[0] || !filterDateRange[1]}
                     size='small'
                   >
                     <FilterAltIcon />
                   </Button>
                 </Grid>
+
+                {/* Reset Filter Button */}
                 <Grid item md={1} xs={2}>
                   <Button variant='contained' sx={{ mr: 2, mt: 2 }} onClick={resetFilter} color='error' size='small'>
                     <FilterAltOffIcon />
                   </Button>
                 </Grid>
+
+                {/* Search Input */}
                 <Grid item md={5} xs={8}>
                   <Input.Search
                     placeholder='Search here.....'
@@ -285,6 +341,8 @@ const AdminRevenueReport = () => {
                   />
                 </Grid>
               </Grid>
+
+              {/* Table component to display the data */}
               <Table
                 columns={columns}
                 dataSource={data}
@@ -306,15 +364,22 @@ const AdminRevenueReport = () => {
                 onChange={pagination => setPagination(pagination)}
               />
 
+              {/* Total Sale */}
               <Typography variant='div' sx={{ my: 2, fontWeight: 'bold', display: 'block' }}>
                 Total Sale= {totalSale.toFixed(2)}
               </Typography>
+
+              {/* Total Commission */}
               <Typography variant='div' sx={{ my: 2, fontWeight: 'bold', display: 'block' }}>
                 Total Commission= {totalCommision.toFixed(2)}
               </Typography>
+
+              {/* Total Payout Distribution */}
               <Typography variant='div' sx={{ my: 2, fontWeight: 'bold', display: 'block' }}>
-                Total Commission= {totalPayoutDistribution.toFixed(2)}
+                Total Payout Distribution= {totalPayoutDistribution.toFixed(2)}
               </Typography>
+
+              {/* Total Company Revenue */}
               <Typography variant='div' sx={{ my: 2, fontWeight: 'bold', display: 'block' }}>
                 Total Company Revenue= {totalCompanyRevenue.toFixed(2)}
               </Typography>
