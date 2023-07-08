@@ -113,6 +113,7 @@ const Manage = () => {
   //----------
   return (
     <>
+      {/* Commission Manage Heading */}
       <Grid item xs={12}>
         <Box>
           <Typography variant='h5' sx={{ my: 8 }}>
@@ -121,9 +122,11 @@ const Manage = () => {
         </Box>
       </Grid>
 
+      {/* Card component for the commission manage form */}
       <Card component='div' sx={{ position: 'relative', mb: 7 }}>
         <CardContent>
           <Grid container spacing={3}>
+            {/* Level 1 Bonus Input */}
             <Grid item xs={12}>
               <TextField
                 xs={6}
@@ -134,6 +137,7 @@ const Manage = () => {
                 placeholder='Level 1 Bonus'
               />
             </Grid>
+            {/* Level 2 Bonus Input */}
             <Grid item xs={12}>
               <TextField
                 xs={6}
@@ -144,6 +148,7 @@ const Manage = () => {
                 placeholder='Level 2 Bonus'
               />
             </Grid>
+            {/* Level 3 Bonus Input */}
             <Grid item xs={12}>
               <TextField
                 xs={6}
@@ -154,6 +159,7 @@ const Manage = () => {
                 placeholder='Level 3 Bonus'
               />
             </Grid>
+            {/* Level 4 Bonus Input */}
             <Grid item xs={12}>
               <TextField
                 xs={6}
@@ -164,6 +170,7 @@ const Manage = () => {
                 placeholder='Level 4 Bonus'
               />
             </Grid>
+            {/* Level 5 Bonus Input */}
             <Grid item xs={12}>
               <TextField
                 xs={6}
@@ -174,6 +181,7 @@ const Manage = () => {
                 placeholder='Level 5 Bonus'
               />
             </Grid>
+            {/* Cofounder Bonus Input */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -184,6 +192,7 @@ const Manage = () => {
               />
             </Grid>
 
+            {/* Submit Button */}
             <Grid item md={6} xs={12}>
               <Button variant='contained' sx={{ mr: 2 }} onClick={submitHandler}>
                 Submit
@@ -192,6 +201,8 @@ const Manage = () => {
           </Grid>
         </CardContent>
       </Card>
+
+      {/* Backdrop for showing loading spinner */}
       <Backdrop sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }} open={open}>
         <CircularProgress color='inherit' />
       </Backdrop>

@@ -101,15 +101,19 @@ const Dashboard = () => {
     <div>
       <Card component='div' sx={{ position: 'relative', mb: 7 }}>
         <CardContent sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          {/* Today's Register */}
           <Typography variant='p' sx={{ fontWeight: 'bold' }}>
             Today Register ( {data.usersRegistered?.today})
           </Typography>
+          {/* This Week's Register */}
           <Typography variant='p' sx={{ fontWeight: 'bold' }}>
             This Week Register ( {data.usersRegistered?.thisWeek})
           </Typography>
+          {/* This Month's Register */}
           <Typography variant='p' sx={{ fontWeight: 'bold' }}>
             This Month Register ( {data.usersRegistered?.thisMonth} )
           </Typography>
+          {/* This Year's Register */}
           <Typography variant='p' sx={{ fontWeight: 'bold' }}>
             This Year Register ( {data.usersRegistered?.thisYear} )
           </Typography>
@@ -118,8 +122,10 @@ const Dashboard = () => {
 
       <Grid container spacing={5} sx={{ mt: 5 }} className='match-height'>
         <Grid item xs={12} md={4}>
+          {/* Card displaying total registered users */}
           <Card component='div' sx={{ position: 'relative', mb: 7 }}>
             <CardContent>
+              {/* Total registered users count */}
               <Typography
                 component='div'
                 variant='p'
@@ -129,9 +135,12 @@ const Dashboard = () => {
                 <Avatar sx={{}} variant='rounded'></Avatar>
               </Typography>
 
+              {/* Title: Total Registered User */}
               <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
                 Total Registered User
               </Typography>
+
+              {/* Subtitle: User registration count for today */}
               <Typography
                 component='div'
                 variant='p'
@@ -142,9 +151,12 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </Grid>
+
         <Grid item xs={12} md={4}>
+          {/* Card displaying total sales amount */}
           <Card component='div' sx={{ position: 'relative', mb: 7 }}>
             <CardContent>
+              {/* Total sales amount */}
               <Typography
                 component='div'
                 variant='p'
@@ -154,9 +166,12 @@ const Dashboard = () => {
                 <Avatar sx={{}} variant='rounded'></Avatar>
               </Typography>
 
+              {/* Title: Total Sales Amount */}
               <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
                 Total Sales Amount
               </Typography>
+
+              {/* Subtitle: Sales generated today */}
               <Typography
                 component='div'
                 variant='p'
@@ -167,9 +182,12 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </Grid>
+
         <Grid item xs={12} md={4}>
+          {/* Card displaying pending level income distributed */}
           <Card component='div' sx={{ position: 'relative', mb: 7 }}>
             <CardContent>
+              {/* Total pending level income distributed */}
               <Typography
                 component='div'
                 variant='p'
@@ -179,22 +197,28 @@ const Dashboard = () => {
                 <Avatar sx={{}} variant='rounded'></Avatar>
               </Typography>
 
+              {/* Title: Pending Level Income Distributed */}
               <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
                 Pending Level Income Distributed
               </Typography>
+
+              {/* Subtitle: Distribution today */}
               <Typography
                 component='div'
                 variant='p'
                 sx={{ fontWeight: 'bold', mt: 10, display: 'flex', justifyContent: 'center', fontSize: 20 }}
               >
-                {data.pendingLevelIncomeDistributed?.today} distribute today
+                {data.pendingLevelIncomeDistributed?.today} distributed today
               </Typography>
             </CardContent>
           </Card>
         </Grid>
+
         <Grid item xs={12} md={4}>
+          {/* Card displaying paid level income distributed */}
           <Card component='div' sx={{ position: 'relative', mb: 7 }}>
             <CardContent>
+              {/* Total paid level income distributed */}
               <Typography
                 component='div'
                 variant='p'
@@ -204,22 +228,28 @@ const Dashboard = () => {
                 <Avatar sx={{}} variant='rounded'></Avatar>
               </Typography>
 
+              {/* Title: Paid Level Income Distributed */}
               <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
                 Paid Level Income Distributed
               </Typography>
+
+              {/* Subtitle: Distribution today */}
               <Typography
                 component='div'
                 variant='p'
                 sx={{ fontWeight: 'bold', mt: 10, display: 'flex', justifyContent: 'center', fontSize: 20 }}
               >
-                {data.paidLevelIncomeDistributed?.today} distribute today
+                {data.paidLevelIncomeDistributed?.today} distributed today
               </Typography>
             </CardContent>
           </Card>
         </Grid>
+
         <Grid item xs={12} md={4}>
+          {/* Card displaying pending co-founder income distributed */}
           <Card component='div' sx={{ position: 'relative', mb: 7 }}>
             <CardContent>
+              {/* Total pending co-founder income distributed */}
               <Typography
                 component='div'
                 variant='p'
@@ -229,22 +259,28 @@ const Dashboard = () => {
                 <Avatar sx={{}} variant='rounded'></Avatar>
               </Typography>
 
+              {/* Title: Pending Co-founder Income Distributed */}
               <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
                 Pending Co-founder Income Distributed
               </Typography>
+
+              {/* Subtitle: Distribution today */}
               <Typography
                 component='div'
                 variant='p'
                 sx={{ fontWeight: 'bold', mt: 10, display: 'flex', justifyContent: 'center', fontSize: 20 }}
               >
-                {data.pendingCoFounderIncomeDistributed?.today} distribute today
+                {data.pendingCoFounderIncomeDistributed?.today} distributed today
               </Typography>
             </CardContent>
           </Card>
         </Grid>
+
         <Grid item xs={12} md={4}>
+          {/* Card displaying paid co-founder income distributed */}
           <Card component='div' sx={{ position: 'relative', mb: 7 }}>
             <CardContent>
+              {/* Total paid co-founder income distributed */}
               <Typography
                 component='div'
                 variant='p'
@@ -254,22 +290,28 @@ const Dashboard = () => {
                 <Avatar sx={{}} variant='rounded'></Avatar>
               </Typography>
 
+              {/* Title: Paid Co-founder Income Distributed */}
               <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
                 Paid Co-founder Income Distributed
               </Typography>
+
+              {/* Subtitle: Distribution today */}
               <Typography
                 component='div'
                 variant='p'
                 sx={{ fontWeight: 'bold', mt: 10, display: 'flex', justifyContent: 'center', fontSize: 20 }}
               >
-                {data.paidCoFounderIncomeDistributed?.today} distribute today
+                {data.paidCoFounderIncomeDistributed?.today} distributed today
               </Typography>
             </CardContent>
           </Card>
         </Grid>
+
         <Grid item xs={12} md={4}>
+          {/* Card displaying pending withdrawals */}
           <Card component='div' sx={{ position: 'relative', mb: 7 }}>
             <CardContent>
+              {/* Total pending withdrawals */}
               <Typography
                 component='div'
                 variant='p'
@@ -279,9 +321,12 @@ const Dashboard = () => {
                 <Avatar sx={{}} variant='rounded'></Avatar>
               </Typography>
 
+              {/* Title: Pending Withdrawal */}
               <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
                 Pending Withdrawal
               </Typography>
+
+              {/* Subtitle: Number of pending withdrawals today */}
               <Typography
                 component='div'
                 variant='p'
@@ -292,9 +337,12 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </Grid>
+
         <Grid item xs={12} md={4}>
+          {/* Card displaying company revenue */}
           <Card component='div' sx={{ position: 'relative', mb: 7 }}>
             <CardContent>
+              {/* Total company revenue */}
               <Typography
                 component='div'
                 variant='p'
@@ -304,9 +352,12 @@ const Dashboard = () => {
                 <Avatar sx={{}} variant='rounded'></Avatar>
               </Typography>
 
+              {/* Title: Company Revenue Till Now */}
               <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
                 Company Revenue Till Now
               </Typography>
+
+              {/* Subtitle: Revenue amount (currently set to 0) */}
               <Typography
                 component='div'
                 variant='p'
@@ -317,9 +368,12 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </Grid>
+
         <Grid item xs={12}>
+          {/* Card displaying Highcharts chart */}
           <Card component='div' sx={{ position: 'relative', mb: 7 }}>
             <CardContent>
+              {/* Highcharts chart */}
               <HighchartsReact
                 highcharts={Highcharts}
                 options={{
@@ -331,9 +385,12 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </Grid>
+
         <Grid item xs={12}>
+          {/* Card displaying Highcharts map chart */}
           <Card component='div' sx={{ position: 'relative', mb: 7 }}>
             <CardContent>
+              {/* Highcharts map chart */}
               <HighchartsReact
                 highcharts={Highcharts}
                 constructorType={'mapChart'}
@@ -345,9 +402,12 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </Grid>
+
         <Grid item xs={12}>
+          {/* Card displaying ComposableMap */}
           <Card component='div' sx={{ position: 'relative', mb: 7 }}>
             <CardContent>
+              {/* ComposableMap */}
               <ComposableMap fill='darkslategray' stroke='gray' strokeWidth='0.1px' projectionConfig={{ scale: 140 }}>
                 <Geographies geography={geoUrl}>
                   {({ geographies }) => geographies.map(geo => <Geography key={geo.rsmKey} geography={geo} />)}
