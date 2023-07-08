@@ -12,15 +12,6 @@ export const fetchData = createAsyncThunk('appInvoice/fetchData', async params =
   return response.data
 })
 
-export const deleteInvoice = createAsyncThunk('appInvoice/deleteData', async (id, { getState, dispatch }) => {
-  const response = await axios.delete('/apps/invoice/delete', {
-    data: id
-  })
-  await dispatch(fetchData(getState().invoice.params))
-
-  return response.data
-})
-
 export const appInvoiceSlice = createSlice({
   name: 'appInvoice',
   initialState: {
