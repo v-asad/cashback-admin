@@ -25,7 +25,6 @@ import {
   MenuItem,
   Select
 } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
 import TextareaAutosize from '@mui/base/TextareaAutosize'
 
 //----------
@@ -389,14 +388,7 @@ const OfficialAnnouncement = () => {
             onChange={pagination => setPagination(pagination)}
           />
 
-          <DataGrid
-            rows={data}
-            columns={columns}
-            pageSize={10}
-            getRowId={row => row.key}
-            rowsPerPageOptions={[10]}
-            autoHeight
-          />
+       
         </CardContent>
       </Card>
 

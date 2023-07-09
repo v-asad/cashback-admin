@@ -60,7 +60,7 @@ const AdminRevenueReport = () => {
 
   // State variables to store and update total sale, commission, payout distribution, and company revenue
   const [totalSale, setTotalSale] = useState(0)
-  const [totalCommission, setTotalCommission] = useState(0)
+  const [totalCommision, setTotalCommision] = useState(0)
   const [totalPayoutDistribution, setTotalPayoutDistribution] = useState(0)
   const [totalCompanyRevenue, setTotalCompanyRevenue] = useState(0)
 

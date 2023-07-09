@@ -80,7 +80,7 @@ const defaultValues = {
   password: '',
   username: ''
 }
-
+const skin = 'bordered';
 const LoginPage = () => {
   //----------
   //  States

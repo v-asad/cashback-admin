@@ -21,10 +21,10 @@ const routes = [
         title: 'All members Genealogy',
         path: '/member-management/all-member-genealogy'
       },
-      {
-        title: 'Password Tracker',
-        path: '/member-management/password-tracker'
-      }
+      // {
+      //   title: 'Password Tracker',
+      //   path: '/member-management/password-tracker'
+      // }
     ]
   },
 

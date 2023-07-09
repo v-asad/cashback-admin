@@ -212,8 +212,8 @@ const AddNewMember = () => {
               />
             </Grid>
             <Grid item md={4} xs={6}>
-              <FormControl variant='outlined'>
-                <InputLabel htmlFor='outlined-adornment-password'>Password</InputLabel>
+              <FormControl sx={{width:'100%'}} variant='outlined'>
+                <InputLabel sx={{width:'100%'}} htmlFor='outlined-adornment-password'>Password</InputLabel>
                 <OutlinedInput
                   id='outlined-adornment-password'
                   type={showPassword ? 'text' : 'password'}
@@ -235,8 +235,8 @@ const AddNewMember = () => {
               </FormControl>
             </Grid>
             <Grid item md={4} xs={6}>
-              <FormControl variant='outlined'>
-                <InputLabel htmlFor='outlined-adornment-password'>Password</InputLabel>
+              <FormControl sx={{width:'100%'}} variant='outlined'>
+                <InputLabel sx={{width:'100%'}} htmlFor='outlined-adornment-password'>Confrim Password</InputLabel>
                 <OutlinedInput
                   id='outlined-adornment-password'
                   type={showPassword ? 'text' : 'password'}

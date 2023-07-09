@@ -139,7 +139,7 @@ const ChangePassword = () => {
 
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <FormControl variant='outlined'>
+              <FormControl sx={{width:'100%'}} variant='outlined'>
                 <InputLabel htmlFor='outlined-adornment-password'>Password</InputLabel>
                 <OutlinedInput
                   id='outlined-adornment-password'
@@ -163,7 +163,7 @@ const ChangePassword = () => {
               </FormControl>
             </Grid>
             <Grid item md={6} xs={12}>
-              <FormControl variant='outlined'>
+              <FormControl sx={{width:'100%'}} variant='outlined'>
                 <InputLabel htmlFor='outlined-adornment-password'>New Password</InputLabel>
                 <OutlinedInput
                   id='outlined-adornment-password'
@@ -186,8 +186,8 @@ const ChangePassword = () => {
                 />
               </FormControl>
             </Grid>
-            <Grid item md={12} xs={12}>
-              <FormControl variant='outlined'>
+            <Grid item md={6} xs={12}>
+              <FormControl sx={{width:'100%'}} variant='outlined'>
                 <InputLabel htmlFor='outlined-adornment-password'>Confirm New Password</InputLabel>
                 <OutlinedInput
                   id='outlined-adornment-password'

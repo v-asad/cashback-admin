@@ -15,7 +15,7 @@ import { ComposableMap, Geographies, Geography } from 'react-simple-maps'
 import { toast } from 'react-hot-toast'
 import Highcharts from 'highcharts'
 import axios from 'axios'
-
+import HighchartsReact from 'highcharts-react-official';
 //----------
 // Local Imports
 //----------
