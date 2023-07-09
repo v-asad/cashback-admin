@@ -213,7 +213,6 @@ const AllMemberList = () => {
     editUser[index] = value
     setEditUser(editUser)
     event.target.value = value
-    console.log(editUser, editUser.ref_id)
   }
 
   //----------

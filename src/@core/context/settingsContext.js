@@ -39,9 +39,7 @@ const restoreSettings = () => {
     } else {
       settings = initialSettings
     }
-  } catch (err) {
-    console.error(err)
-  }
+  } catch (err) {}
 
   return settings
 }

@@ -90,7 +90,6 @@ const AllMemberGenealogy = () => {
               </Button>
             </Grid>
           </Grid>
-          {console.log(data)}
           {data ? (
             <Grid sx={{ display: 'flex', justifyContent: 'center' }}>
               <ul id='myUL'>

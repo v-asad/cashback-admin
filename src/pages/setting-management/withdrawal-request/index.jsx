@@ -50,7 +50,6 @@ const WithDrawBlock = () => {
   //----------
   const submitHandler = () => {
     let errors = 0
-    console.log(status, userId)
     if (status === '') {
       toast.error('Block status is required!')
       errors++

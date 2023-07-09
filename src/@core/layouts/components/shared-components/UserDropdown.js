@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, Fragment, useEffect } from 'react'
+import { useState } from 'react'
 
 // ** Next Import
 import { useRouter } from 'next/router'
@@ -19,7 +19,6 @@ import Icon from 'src/@core/components/icon'
 
 // ** Context
 import { useAuth } from 'src/hooks/useAuth'
-import useRole from 'src/hooks/useRole'
 
 // ** Styled Components
 const BadgeContentSpan = styled('span')(({ theme }) => ({
@@ -35,7 +34,6 @@ const UserDropdown = props => {
   const { settings } = props
 
   const auth = useAuth()
-  const role = useRole()
 
   // ** States
   const [anchorEl, setAnchorEl] = useState(null)
@@ -58,28 +56,13 @@ const UserDropdown = props => {
     setAnchorEl(null)
   }
 
-  const styles = {
-    py: 2,
-    px: 4,
-    width: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    color: 'text.primary',
-    textDecoration: 'none',
-    '& svg': {
-      mr: 2,
-      fontSize: '1.375rem',
-      color: 'text.primary'
-    }
-  }
-
   const handleLogout = () => {
     logout()
     handleDropdownClose()
   }
 
   return (
-    <Fragment>
+    <>
       <Badge
         overlap='circular'
         onClick={handleDropdownOpen}
@@ -94,13 +77,13 @@ const UserDropdown = props => {
           alt='John Doe'
           onClick={handleDropdownOpen}
           sx={{ width: 40, height: 40 }}
-          src={auth.user.image?auth.user.image:'/images/avatars/1.png'}
+          src={auth.user.image ? auth.user.image : '/images/avatars/1.png'}
         />
       </Badge>
       <Box sx={{ display: 'flex', ml: 3, alignItems: 'flex-start', flexDirection: 'column' }}>
         <Typography sx={{ fontWeight: 600 }}>{auth.user.name}</Typography>
         <Typography variant='body2' sx={{ fontSize: '0.8rem', color: 'text.disabled' }}>
-          {role}
+          {Admin}
         </Typography>
       </Box>
       <Menu
@@ -121,12 +104,16 @@ const UserDropdown = props => {
                 horizontal: 'right'
               }}
             >
-              <Avatar alt={auth.user.name} src={auth.user.image?auth.user.image:'/images/avatars/1.png'} sx={{ width: '2.5rem', height: '2.5rem' }} />
+              <Avatar
+                alt={auth.user.name}
+                src={auth.user.image ? auth.user.image : '/images/avatars/1.png'}
+                sx={{ width: '2.5rem', height: '2.5rem' }}
+              />
             </Badge>
             <Box sx={{ display: 'flex', ml: 3, alignItems: 'flex-start', flexDirection: 'column' }}>
               <Typography sx={{ fontWeight: 600 }}>{auth.user.name}</Typography>
               <Typography variant='body2' sx={{ fontSize: '0.8rem', color: 'text.disabled' }}>
-                {role}
+                {Admin}
               </Typography>
             </Box>
           </Box>
@@ -140,7 +127,7 @@ const UserDropdown = props => {
           Logout
         </MenuItem>
       </Menu>
-    </Fragment>
+    </>
   )
 }
 

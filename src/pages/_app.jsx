@@ -19,7 +19,6 @@ import themeConfig from 'src/configs/themeConfig'
 // Set application language
 if (typeof window !== 'undefined') {
   let setLang = localStorage.localization || process.env.NEXT_PUBLIC_LANG
-  console.log(process.env.NEXT_PUBLIC_LANG)
   localStorage.setItem('localization', setLang)
 }
 

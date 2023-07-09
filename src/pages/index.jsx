@@ -10,16 +10,11 @@ import Spinner from 'src/@core/components/spinner'
 // ** Hook Imports
 import { useAuth } from 'src/hooks/useAuth'
 
-import authConfig from 'src/configs/auth'
-
 /**
  *  Set Home URL based on User Roles
  */
 export const getHomeRoute = role => {
-  const existing = authConfig.roles.find(r => role.name === role)
-  console.log(existing)
-  if (existing) return existing.homepage
-  else return '/dashboard'
+  return '/dashboard'
 }
 
 const Home = () => {

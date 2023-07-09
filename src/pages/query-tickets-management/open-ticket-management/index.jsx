@@ -248,10 +248,7 @@ const OpenTicketManage = () => {
   //----------
   const editItem = id => {
     let item = data.filter(d => id == d.id)
-    item.map(i => {
-      setTicket(i)
-      console.log(i)
-    })
+    item.map(i => setTicket(i))
     setEditModalOpen(true)
   }
 
@@ -296,7 +293,6 @@ const OpenTicketManage = () => {
           let tempData = data.filter(d => d.id != ticket.id)
           tempData = tempData.map((d, key) => {
             d.key = key
-            console.log(d)
             return d
           })
           setData(tempData)

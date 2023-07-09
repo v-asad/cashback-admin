@@ -239,13 +239,7 @@ const OurVendor = () => {
                       </CardContent>
                       <Grid item xs={12} sx={{ px: 5, width: '100%' }}>
                         <Typography sx={{ fontWeight: 'bold', display: 'flex', justifyContent: 'space-between' }}>
-                          <Button
-                            variant='outlined'
-                            onClick={e => {
-                              console.log(c.location)
-                              window.open(c.location, '_blank')
-                            }}
-                          >
+                          <Button variant='outlined' onClick={() => window.open(c.location, '_blank')}>
                             View Location
                           </Button>
                           <Button variant='contained' onClick={e => viewDetails(c.user_id)}>

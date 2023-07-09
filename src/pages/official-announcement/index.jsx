@@ -278,10 +278,7 @@ const OfficialAnnouncement = () => {
         }
       )
       .then(response => {
-        console.log(response)
         setEditModalOpen(false)
-        // data.push(response.data.data)
-        console.log(response.data.data)
         let newObj = response.data.data
         let lastKey = 0
         data.map(d => {
@@ -290,8 +287,6 @@ const OfficialAnnouncement = () => {
         newObj.key = lastKey ? lastKey + 1 : lastKey
         let tempData = [...data, newObj]
 
-        // data.push(newObj)
-        console.log(tempData)
         setData(tempData)
         toast.success(response.data.message)
       })
