@@ -60,7 +60,7 @@ const AdminRevenueReport = () => {
 
   // State variables to store and update total sale, commission, payout distribution, and company revenue
   const [totalSale, setTotalSale] = useState(0)
-  const [totalCommision, setTotalCommision] = useState(0)
+  const [totalCommision, setTotalCommission] = useState(0)
   const [totalPayoutDistribution, setTotalPayoutDistribution] = useState(0)
   const [totalCompanyRevenue, setTotalCompanyRevenue] = useState(0)
 
@@ -96,7 +96,7 @@ const AdminRevenueReport = () => {
         .then(response => {
           // Updating state variables with the fetched data
           setTotalSale(response.data.totalSale)
-          setTotalCommission(response.data.totalCommission)
+          setTotalCommission(response.data.totalCommision)
           setTotalPayoutDistribution(response.data.totalPayoutDistribution)
           setTotalCompanyRevenue(response.data.totalCompanyRevenue)
 
@@ -371,7 +371,7 @@ const AdminRevenueReport = () => {
 
               {/* Total Commission */}
               <Typography variant='div' sx={{ my: 2, fontWeight: 'bold', display: 'block' }}>
-                Total Commission= {totalCommision.toFixed(2)}
+                Total Commission= {totalCommision?.toFixed(2)}
               </Typography>
 
               {/* Total Payout Distribution */}
